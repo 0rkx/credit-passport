@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-import csv
 import hashlib
-import io
 import json
-import re
+import mimetypes
 import uuid
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -26,7 +24,6 @@ from .schemas import (
     ConfigResponse,
     ChallengerScoreResponse,
     DomainConfig,
-    Direction,
     EvidenceResponse,
     EvidenceSourceResponse,
     EvidenceType,
@@ -58,6 +55,7 @@ from .scoring import (
     event_response,
     unique_events,
 )
+from .statement_parser import StatementParseError, parse_csv, parse_statement_file
 from .transition_guide import TransitionGuide, suggested_prompts
 
 
@@ -242,39 +240,6 @@ def _statement_fingerprint(record: StatementRecord) -> str:
     )
 
 
-def _construct_event_type(description: str, direction: str) -> str:
-    text = description.lower()
-    keywords = (
-        ("salary", "salary"),
-        ("payroll", "salary"),
-        ("wage", "salary"),
-        ("rent", "rent"),
-        ("utility", "utility"),
-        ("electric", "utility"),
-        ("insurance", "insurance"),
-        ("remittance", "remittance"),
-        ("transfer", "international_transfer"),
-        ("loan", "loan_payment"),
-        ("repayment", "asset_repayment"),
-        ("saving", "savings"),
-        ("deposit", "deposit"),
-        ("stipend", "stipend"),
-    )
-    for keyword, event_type in keywords:
-        if keyword in text:
-            return event_type
-    return "other"
-
-
-def _parse_amount(raw: str) -> tuple[float, Direction]:
-    cleaned = raw.strip().replace(",", "")
-    if not cleaned:
-        raise ValueError("amount is empty")
-    negative = cleaned.startswith("-")
-    value = abs(float(re.sub(r"[^0-9.\-]", "", cleaned)))
-    return value, Direction.DEBIT if negative else Direction.CREDIT
-
-
 def _csv_statement(
     content: bytes,
     *,
@@ -286,84 +251,9 @@ def _csv_statement(
     if not consent:
         raise _http_error(400, "consent must be true before a statement is ingested")
     try:
-        text = content.decode("utf-8-sig")
-    except UnicodeDecodeError as exc:
-        raise _http_error(422, "CSV must be UTF-8 encoded") from exc
-    reader = csv.DictReader(io.StringIO(text))
-    if not reader.fieldnames:
-        raise _http_error(422, "CSV must include a header row")
-    aliases = {re.sub(r"[^a-z0-9]", "", name.lower()): name for name in reader.fieldnames if name}
-
-    def column(*names: str) -> str | None:
-        for name in names:
-            key = re.sub(r"[^a-z0-9]", "", name.lower())
-            if key in aliases:
-                return aliases[key]
-        return None
-
-    date_column = column("occurred_on", "date", "transaction_date", "posted_date")
-    amount_column = column("amount", "value", "transaction_amount")
-    direction_column = column("direction", "type", "credit_debit")
-    event_column = column("event_type", "category", "transaction_type")
-    description_column = column("description", "narration", "memo", "details")
-    currency_column = column("currency", "ccy")
-    balance_column = column("balance_after", "balance", "running_balance")
-    reference_column = column("reference", "reference_id", "transaction_id", "id")
-    due_column = column("due_on", "due_date")
-    paid_column = column("paid_on", "paid_date")
-    missing = [label for label, value in (("date", date_column), ("amount", amount_column)) if value is None]
-    if missing:
-        raise _http_error(422, f"CSV is missing required column(s): {', '.join(missing)}")
-
-    records: list[StatementRecord] = []
-    errors: list[str] = []
-    for row_number, row in enumerate(reader, start=2):
-        try:
-            assert date_column is not None and amount_column is not None
-            occurred_on = date.fromisoformat(str(row.get(date_column, "")).strip()[:10])
-            amount, inferred_direction = _parse_amount(str(row.get(amount_column, "")))
-            raw_direction = str(row.get(direction_column, "")).strip().lower() if direction_column else ""
-            direction = inferred_direction
-            if raw_direction in {"credit", "cr", "in", "income", "inflow"}:
-                direction = Direction.CREDIT
-            elif raw_direction in {"debit", "dr", "out", "expense", "outflow"}:
-                direction = Direction.DEBIT
-            description = str(row.get(description_column, "")).strip() if description_column else ""
-            event_type = str(row.get(event_column, "")).strip() if event_column else ""
-            record_currency = str(row.get(currency_column, "")).strip().upper() if currency_column else currency
-            records.append(
-                StatementRecord(
-                    occurred_on=occurred_on,
-                    event_type=event_type or _construct_event_type(description, direction.value),
-                    amount=amount,
-                    currency=record_currency or currency,
-                    direction=direction,
-                    reference=str(row.get(reference_column, "")).strip() or None if reference_column else None,
-                    due_on=date.fromisoformat(str(row.get(due_column, "")).strip()[:10]) if due_column and str(row.get(due_column, "")).strip() else None,
-                    paid_on=date.fromisoformat(str(row.get(paid_column, "")).strip()[:10]) if paid_column and str(row.get(paid_column, "")).strip() else None,
-                    description=description or None,
-                    balance_after=float(str(row.get(balance_column, "")).replace(",", "")) if balance_column and str(row.get(balance_column, "")).strip() else None,
-                )
-            )
-        except (AssertionError, ValueError, TypeError) as exc:
-            errors.append(f"row {row_number}: {exc}")
-            if len(errors) >= 10:
-                break
-    if errors:
-        raise _http_error(422, "Invalid CSV rows: " + "; ".join(errors))
-    if not records:
-        raise _http_error(422, "CSV contains no transaction rows")
-    period_start = min(record.occurred_on for record in records)
-    period_end = max(record.occurred_on for record in records)
-    return StructuredStatementIngest(
-        source_type=source_type,
-        provider=provider,
-        currency=currency.upper(),
-        period_start=period_start,
-        period_end=period_end,
-        records=records,
-        consent=True,
-    )
+        return parse_csv(content, source_type=source_type, provider=provider, currency=currency.upper())
+    except StatementParseError as exc:
+        raise _http_error(422, str(exc)) from exc
 
 
 def _guidance(event: TransitionEvent | None) -> list[GuidanceTask]:
@@ -532,7 +422,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return _insert_statement(database, applicant_id, payload)
 
     @app.post("/api/v1/applicants/{applicant_id}/statements", response_model=StatementIngestResponse, status_code=201, tags=["evidence"])
-    async def ingest_statement_csv(
+    async def ingest_statement_file(
         applicant_id: str,
         file: UploadFile = File(...),
         source_type: EvidenceType = Form(EvidenceType.BANK_STATEMENT),
@@ -542,13 +432,32 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     ) -> StatementIngestResponse:
         applicant = _get_applicant(database, applicant_id)
         filename = file.filename or "statement.csv"
-        if not filename.lower().endswith(".csv"):
-            raise _http_error(415, "Only CSV statements are supported currently; XLSX and PDF parsing are not implemented.")
         content = await file.read(runtime.max_upload_bytes + 1)
         if len(content) > runtime.max_upload_bytes:
             raise _http_error(413, f"Statement exceeds the {runtime.max_upload_bytes} byte upload limit")
-        statement = _csv_statement(content, source_type=source_type, provider=provider, currency=currency.upper(), consent=consent)
-        source = _insert_statement(database, applicant_id, statement, filename=filename, content_type=file.content_type or "text/csv", file_bytes=content)
+        if not consent:
+            raise _http_error(400, "consent must be true before a statement is ingested")
+        try:
+            statement = parse_statement_file(
+                content,
+                filename=filename,
+                source_type=source_type,
+                provider=provider,
+                currency=currency.upper(),
+            )
+        except StatementParseError as exc:
+            # Unsupported extensions are a media-type problem; malformed or
+            # unreadable content is a user-correctable validation error.
+            status = 415 if str(exc).startswith("Unsupported statement format") else 422
+            raise _http_error(status, str(exc)) from exc
+        source = _insert_statement(
+            database,
+            applicant_id,
+            statement,
+            filename=filename,
+            content_type=file.content_type or mimetypes.guess_type(filename)[0] or "application/octet-stream",
+            file_bytes=content,
+        )
         score = _score(database, applicant, ProductType(applicant["product"]))
         return StatementIngestResponse(applicant_id=applicant_id, source=source, parsed_rows=len(statement.records), score=score)
 

@@ -1,6 +1,6 @@
 # Credit Passport API
 
-This directory contains the production-shaped FastAPI service for Credit Passport. It stores applicants, permissioned evidence assertions, parsed CSV statement uploads, transition guidance, and score calculations in SQLite. A new database is empty by design: the service never inserts seeded applicants or fabricated financial records at startup.
+This directory contains the production-shaped FastAPI service for Credit Passport. It stores applicants, permissioned evidence assertions, parsed statement uploads, transition guidance, and score calculations in SQLite. A new database is empty by design: the service never inserts seeded applicants or fabricated financial records at startup.
 
 ## Run locally
 
@@ -36,7 +36,7 @@ All application routes are under `/api/v1`.
 | `POST /api/v1/applicants` | Create an applicant profile |
 | `GET /api/v1/applicants/{id}` | Read one applicant and its current summary |
 | `POST /api/v1/applicants/{id}/evidence` | Ingest a structured, consented statement payload |
-| `POST /api/v1/applicants/{id}/statements` | Upload and immediately parse a complete CSV statement |
+| `POST /api/v1/applicants/{id}/statements` | Upload and immediately parse a complete CSV, XLSX, XLS, or text-based PDF statement |
 | `GET /api/v1/applicants/{id}/evidence` | Read source assertions, deduplicated economic events and corroborations |
 | `GET /api/v1/applicants/{id}/score?product=personal-loan` | Calculate the deterministic seven-domain score |
 | `GET /api/v1/applicants/{id}/challenger-score?product=personal-loan` | Run the configured ICP challenger and return probability, provenance and research-only blend |
@@ -115,11 +115,23 @@ or CI variable always wins. These files are ignored by Git, values are never
 printed or logged, and `.env.example` contains the safe variable names only.
 The default remains keyless and deterministic.
 
-### CSV statements
+### Statement uploads (CSV, XLSX, XLS and PDF)
 
-The upload endpoint requires multipart fields `file`, `source_type`, `provider`, `currency`, and `consent=true`. CSV is the only file format currently parsed. XLSX and PDF return HTTP 415 with an explicit unsupported-format response; they are never reported as successfully ingested.
+The upload endpoint requires multipart fields `file`, `source_type`, `provider`, `currency`, and `consent=true`. It accepts `.csv`, `.xlsx`, `.xls`, and text-based `.pdf` files. Image-only/scanned PDFs are rejected with a clear validation error because their rows cannot be verified safely.
 
-The parser accepts common aliases. The minimum useful columns are `date` (or `occurred_on`) and `amount`. Optional columns include `direction`, `event_type`/`category`, `description`/`narration`, `currency`, `balance`, `reference`, `due_on`, and `paid_on`. If direction is omitted, a negative amount is a debit and a positive amount is a credit. If event type is omitted, the parser uses conservative keyword classification from the description and otherwise records `other`.
+Use this human-editable table as the workbook/CSV contract (the first worksheet is read):
+
+```text
+date,event_type,amount,currency,direction,reference,description,balance_after,due_on,paid_on,status,days_past_due
+2026-08-01,salary,18500,AED,credit,PAY-1,Monthly salary,22000,,,,
+2026-08-02,rent,5000,AED,debit,RENT-1,Rent,17000,2026-08-02,2026-08-02,paid,0
+```
+
+`date`/`occurred_on` and one of `amount`, `credit` or `debit` are required. Common aliases are accepted for dates, descriptions, categories, balances, references, due/paid dates, status and days past due. If direction is omitted, a negative amount is a debit and a positive amount is a credit. If event type is omitted or is only a broad label such as `income`/`expense`, the parser classifies the description conservatively (`salary`, `rent`, `utility`, `loan_payment`, `credit_card_payment`, `insurance`, `savings`, `remittance`, and so on). An uploaded score, risk, or recommendation column is never used.
+
+For editable adverse evidence, mark an obligation `status=late`/`missed`/`overdue` and provide `days_past_due`, or provide `due_on` and `paid_on`. The parser converts this into canonical due/paid dates so the commitment domain reflects the late payment. A positive `status=paid`/`on-time` fills a same-day paid date only when the row has a due date (or uses the transaction date as the due date); no score is accepted from the file.
+
+PDF parsing supports a visible table with pipes/tabs or common bank-statement lines such as `date description amount CR/DR balance`. The same canonical row mapping is then used. Unreadable PDFs, missing headers, invalid dates/amounts, and empty statements return HTTP 422; unsupported extensions return HTTP 415.
 
 The raw file is not stored. The service stores upload metadata (filename, byte count and SHA-256) plus the parsed, structured assertions needed for scoring. The complete statement period is preserved in the source record.
 

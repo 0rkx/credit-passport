@@ -162,8 +162,8 @@ def test_csv_statement_upload_persists_upload_and_recomputes_score(client: TestC
         files={"file": ("statement.xlsx", b"not parsed", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")},
         data={"source_type": "bank-statement", "provider": "CSV Bank", "currency": "AED", "consent": "true"},
     )
-    assert unsupported.status_code == 415
-    assert "Only CSV" in unsupported.json()["detail"]
+    assert unsupported.status_code == 422
+    assert "XLSX" in unsupported.json()["detail"]
 
 
 def test_capacity_is_neutral_when_income_cannot_be_classified(client: TestClient):
