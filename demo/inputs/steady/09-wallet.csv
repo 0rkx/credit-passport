@@ -1,0 +1,5 @@
+date,event_type,amount,currency,direction,reference,description
+2026-01-25,deposit,8000,INR,credit,ST-WALLET-0125,Mobile wallet reserve top-up
+2026-03-25,deposit,9000,INR,credit,ST-WALLET-0325,Mobile wallet reserve top-up
+2026-05-25,deposit,10000,INR,credit,ST-WALLET-0525,Mobile wallet reserve top-up
+2026-06-25,other,2500,INR,debit,ST-WALLET-0625,Mobile wallet service spend

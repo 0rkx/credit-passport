@@ -1,0 +1,4 @@
+date,event_type,amount,currency,direction,reference,description
+2026-04-25,salary,77000,INR,credit,WK-PAY-0425,Payroll record for contract month
+2026-05-25,salary,72000,INR,credit,WK-PAY-0525,Payroll record for contract month
+2026-06-25,salary,50000,INR,credit,WK-PAY-0625,Payroll record for contract month

@@ -1,0 +1,66 @@
+{
+  "task": "bureau_score_regression",
+  "dataset": "FICO HELOC challenge data",
+  "target": "ExternalRiskEstimate (x1)",
+  "features": [
+    "x2",
+    "x3",
+    "x4",
+    "x5",
+    "x6",
+    "x7",
+    "x8",
+    "x9",
+    "x10",
+    "x11",
+    "x12",
+    "x13",
+    "x14",
+    "x15",
+    "x16",
+    "x17",
+    "x18",
+    "x19",
+    "x20",
+    "x21",
+    "x22",
+    "x23"
+  ],
+  "rows": {
+    "source_total": 10459,
+    "target_valid_retained": 9861,
+    "target_invalid_excluded": 598,
+    "train": 5916,
+    "calibration_reserved": 1972,
+    "test": 1973
+  },
+  "metrics": {
+    "mae": 2.4844349146816276,
+    "rmse": 3.2604776151848633,
+    "r2": 0.8897139807836211
+  },
+  "baseline_mean_predictor": {
+    "mae": 8.266904855166109,
+    "rmse": 9.822285553184134,
+    "r2": -0.0008825714082640879
+  },
+  "target_summary": {
+    "min": 33,
+    "max": 94,
+    "mean": 72.06044011763512,
+    "test_mean": 71.84541307653319
+  },
+  "missing_value_codes_treated_as_missing": [
+    -7,
+    -8,
+    -9
+  ],
+  "target_valid_range": "0 <= ExternalRiskEstimate <= 100",
+  "split": "random 60/20/20; seed 20260920",
+  "limitations": [
+    "An anonymised US HELOC cohort, not India or migrant financial evidence.",
+    "x1 is a bureau-like benchmark field, not an approved lending decision target."
+  ],
+  "artifact": "/Users/owaiskhan/Documents/ChatGPT/Credit Score/model_pipeline/artifacts/secondary_heloc_external_risk_regressor.joblib",
+  "status": "secondary_research_benchmark"
+}

@@ -1,0 +1,7 @@
+date,event_type,amount,currency,direction,reference,due_on,paid_on,description
+2026-01-21,insurance,4500,INR,debit,ST-INS-0121,2026-01-21,2026-01-21,Health cover premium
+2026-02-21,insurance,4500,INR,debit,ST-INS-0221,2026-02-21,2026-02-21,Health cover premium
+2026-03-21,insurance,4500,INR,debit,ST-INS-0321,2026-03-21,2026-03-21,Health cover premium
+2026-04-21,insurance,4500,INR,debit,ST-INS-0421,2026-04-21,2026-04-21,Health cover premium
+2026-05-21,insurance,4500,INR,debit,ST-INS-0521,2026-05-21,2026-05-21,Health cover premium
+2026-06-21,insurance,4500,INR,debit,ST-INS-0621,2026-06-21,2026-06-21,Health cover premium

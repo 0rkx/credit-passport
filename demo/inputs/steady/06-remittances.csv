@@ -1,0 +1,5 @@
+date,event_type,amount,currency,direction,reference,description
+2026-01-15,remittance,40000,INR,credit,ST-REM-0115,Inbound family remittance converted to INR
+2026-02-15,remittance,42000,INR,credit,ST-REM-0215,Inbound family remittance converted to INR
+2026-04-15,remittance,38000,INR,credit,ST-REM-0415,Inbound family remittance converted to INR
+2026-06-15,remittance,45000,INR,credit,ST-REM-0615,Inbound family remittance converted to INR

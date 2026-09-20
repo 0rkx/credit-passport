@@ -1,0 +1,4 @@
+date,event_type,amount,currency,direction,reference,description
+2026-07-20,merchant_sales,45000,INR,credit,MX-MERCH-0720,Card-reader sales settlement
+2026-08-20,merchant_sales,80000,INR,credit,MX-MERCH-0820,Card-reader sales settlement
+2026-09-20,merchant_sales,30000,INR,credit,MX-MERCH-0920,Card-reader sales settlement

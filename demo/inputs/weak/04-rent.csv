@@ -1,0 +1,7 @@
+date,event_type,amount,currency,direction,reference,due_on,paid_on,description
+2026-04-05,rent,32000,INR,debit,WK-RENT-0405,2026-04-05,2026-04-09,Monthly home rent; paid late
+2026-05-05,rent,32000,INR,debit,WK-RENT-0505,2026-05-05,2026-05-05,Monthly home rent
+2026-06-05,rent,32000,INR,debit,WK-RENT-0605,2026-06-05,2026-06-12,Monthly home rent; paid late
+2026-07-05,rent,32000,INR,debit,WK-RENT-0705,2026-07-05,2026-07-05,Monthly home rent
+2026-08-05,rent,32000,INR,debit,WK-RENT-0805,2026-08-05,2026-08-15,Monthly home rent; paid late
+2026-09-05,rent,32000,INR,debit,WK-RENT-0905,2026-09-05,2026-09-19,Monthly home rent; paid late

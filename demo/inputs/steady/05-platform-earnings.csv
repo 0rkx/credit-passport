@@ -1,0 +1,7 @@
+date,event_type,amount,currency,direction,reference,description
+2026-01-20,platform_earnings,18000,INR,credit,ST-GIG-0120,Weekend tutoring platform payout
+2026-02-20,platform_earnings,17000,INR,credit,ST-GIG-0220,Weekend tutoring platform payout
+2026-03-20,platform_earnings,19000,INR,credit,ST-GIG-0320,Weekend tutoring platform payout
+2026-04-20,platform_earnings,18500,INR,credit,ST-GIG-0420,Weekend tutoring platform payout
+2026-05-20,platform_earnings,20000,INR,credit,ST-GIG-0520,Weekend tutoring platform payout
+2026-06-20,platform_earnings,19500,INR,credit,ST-GIG-0620,Weekend tutoring platform payout

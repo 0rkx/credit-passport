@@ -1,0 +1,7 @@
+date,event_type,amount,currency,direction,reference,due_on,paid_on,description
+2026-04-12,utility,9500,INR,debit,WK-UTIL-0412,2026-04-12,2026-04-20,Electricity and internet bill; paid late
+2026-05-12,utility,9800,INR,debit,WK-UTIL-0512,2026-05-12,2026-05-12,Electricity and internet bill
+2026-06-12,utility,10000,INR,debit,WK-UTIL-0612,2026-06-12,2026-06-24,Electricity and internet bill; paid late
+2026-07-12,utility,10200,INR,debit,WK-UTIL-0712,2026-07-12,2026-07-12,Electricity and internet bill
+2026-08-12,utility,10500,INR,debit,WK-UTIL-0812,2026-08-12,2026-08-23,Electricity and internet bill; paid late
+2026-09-12,utility,10800,INR,debit,WK-UTIL-0912,2026-09-12,2026-09-20,Electricity and internet bill; paid late

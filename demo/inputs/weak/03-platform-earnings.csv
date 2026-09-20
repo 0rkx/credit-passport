@@ -1,0 +1,4 @@
+date,event_type,amount,currency,direction,reference,description
+2026-04-20,platform_earnings,12000,INR,credit,WK-GIG-0420,Small delivery platform payout
+2026-06-20,platform_earnings,5000,INR,credit,WK-GIG-0620,Small delivery platform payout
+2026-08-20,platform_earnings,9000,INR,credit,WK-GIG-0820,Small delivery platform payout

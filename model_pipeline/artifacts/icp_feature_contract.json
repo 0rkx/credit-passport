@@ -1,0 +1,259 @@
+{
+  "contract_version": "icp-repayment-v1",
+  "dataset_version": "icp_synthetic_cohort_v1",
+  "target": {
+    "name": "adverse_90d",
+    "positive_class": 1,
+    "positive_class_meaning": "at least one 30+ days-past-due event or adverse restructure within 90 days",
+    "negative_class_meaning": "current or paid as agreed through 90 days",
+    "prediction_semantics": "probability of the positive adverse outcome"
+  },
+  "feature_order": [
+    "requested_amount",
+    "active_month_count",
+    "observed_span_days",
+    "income_event_count",
+    "commitment_event_count",
+    "income_total",
+    "commitment_total",
+    "net_flow_total",
+    "obligation_to_income_ratio",
+    "income_month_count",
+    "commitment_month_count",
+    "income_regularity",
+    "commitment_on_time_rate",
+    "balance_observation_count",
+    "balance_min",
+    "balance_median",
+    "balance_last",
+    "cross_border_event_count",
+    "remittance_event_count",
+    "currency_count"
+  ],
+  "features": [
+    {
+      "name": "requested_amount",
+      "dtype": "number",
+      "nullable": false,
+      "minimum": 0.0,
+      "maximum": 1500000.0,
+      "unit": "normalised application-currency units",
+      "source": "applicant.requested_amount after caller currency normalisation"
+    },
+    {
+      "name": "active_month_count",
+      "dtype": "number",
+      "nullable": true,
+      "minimum": 0.0,
+      "maximum": 10000.0,
+      "unit": "count or days",
+      "source": "reconciled event aggregate: active_month_count"
+    },
+    {
+      "name": "observed_span_days",
+      "dtype": "number",
+      "nullable": true,
+      "minimum": 0.0,
+      "maximum": 10000.0,
+      "unit": "count or days",
+      "source": "reconciled event aggregate: observed_span_days"
+    },
+    {
+      "name": "income_event_count",
+      "dtype": "number",
+      "nullable": true,
+      "minimum": 0.0,
+      "maximum": 10000.0,
+      "unit": "count or days",
+      "source": "reconciled event aggregate: income_event_count"
+    },
+    {
+      "name": "commitment_event_count",
+      "dtype": "number",
+      "nullable": true,
+      "minimum": 0.0,
+      "maximum": 10000.0,
+      "unit": "count or days",
+      "source": "reconciled event aggregate: commitment_event_count"
+    },
+    {
+      "name": "income_total",
+      "dtype": "number",
+      "nullable": true,
+      "minimum": 0.0,
+      "maximum": 10000000.0,
+      "unit": "normalised currency units",
+      "source": "reconciled event aggregate: income_total"
+    },
+    {
+      "name": "commitment_total",
+      "dtype": "number",
+      "nullable": true,
+      "minimum": 0.0,
+      "maximum": 10000000.0,
+      "unit": "normalised currency units",
+      "source": "reconciled event aggregate: commitment_total"
+    },
+    {
+      "name": "net_flow_total",
+      "dtype": "number",
+      "nullable": true,
+      "minimum": -5000000.0,
+      "maximum": 10000000.0,
+      "unit": "normalised currency units",
+      "source": "reconciled event aggregate: net_flow_total"
+    },
+    {
+      "name": "obligation_to_income_ratio",
+      "dtype": "number",
+      "nullable": true,
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "unit": "ratio",
+      "source": "reconciled event aggregate: obligation_to_income_ratio"
+    },
+    {
+      "name": "income_month_count",
+      "dtype": "number",
+      "nullable": true,
+      "minimum": 0.0,
+      "maximum": 10000.0,
+      "unit": "count or days",
+      "source": "reconciled event aggregate: income_month_count"
+    },
+    {
+      "name": "commitment_month_count",
+      "dtype": "number",
+      "nullable": true,
+      "minimum": 0.0,
+      "maximum": 10000.0,
+      "unit": "count or days",
+      "source": "reconciled event aggregate: commitment_month_count"
+    },
+    {
+      "name": "income_regularity",
+      "dtype": "number",
+      "nullable": true,
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "unit": "ratio",
+      "source": "reconciled event aggregate: income_regularity"
+    },
+    {
+      "name": "commitment_on_time_rate",
+      "dtype": "number",
+      "nullable": true,
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "unit": "ratio",
+      "source": "reconciled event aggregate: commitment_on_time_rate"
+    },
+    {
+      "name": "balance_observation_count",
+      "dtype": "number",
+      "nullable": true,
+      "minimum": 0.0,
+      "maximum": 10000.0,
+      "unit": "count or days",
+      "source": "reconciled event aggregate: balance_observation_count"
+    },
+    {
+      "name": "balance_min",
+      "dtype": "number",
+      "nullable": true,
+      "minimum": -5000000.0,
+      "maximum": 10000000.0,
+      "unit": "normalised currency units",
+      "source": "reconciled event aggregate: balance_min"
+    },
+    {
+      "name": "balance_median",
+      "dtype": "number",
+      "nullable": true,
+      "minimum": -5000000.0,
+      "maximum": 10000000.0,
+      "unit": "normalised currency units",
+      "source": "reconciled event aggregate: balance_median"
+    },
+    {
+      "name": "balance_last",
+      "dtype": "number",
+      "nullable": true,
+      "minimum": -5000000.0,
+      "maximum": 10000000.0,
+      "unit": "normalised currency units",
+      "source": "reconciled event aggregate: balance_last"
+    },
+    {
+      "name": "cross_border_event_count",
+      "dtype": "number",
+      "nullable": true,
+      "minimum": 0.0,
+      "maximum": 10000.0,
+      "unit": "count or days",
+      "source": "reconciled event aggregate: cross_border_event_count"
+    },
+    {
+      "name": "remittance_event_count",
+      "dtype": "number",
+      "nullable": true,
+      "minimum": 0.0,
+      "maximum": 10000.0,
+      "unit": "count or days",
+      "source": "reconciled event aggregate: remittance_event_count"
+    },
+    {
+      "name": "currency_count",
+      "dtype": "number",
+      "nullable": true,
+      "minimum": 0.0,
+      "maximum": 10000.0,
+      "unit": "count or days",
+      "source": "reconciled event aggregate: currency_count"
+    }
+  ],
+  "metadata_not_used_as_features": [
+    "person_id",
+    "application_month",
+    "worker_profile",
+    "corridor",
+    "product_type",
+    "commitment_observed",
+    "income_observed",
+    "capacity_observed",
+    "liquidity_observed",
+    "shock_observed",
+    "momentum_observed",
+    "cross_border_observed",
+    "assertion_count",
+    "unique_event_count",
+    "corroborated_count",
+    "source_count",
+    "outcome_reason"
+  ],
+  "forbidden_feature_families": [
+    "bureau_scores_or_credit_bureau_identifiers",
+    "protected_attributes_or_proxies",
+    "age_sex_ethnicity_nationality_religion",
+    "employer_or_school_prestige",
+    "gps_contacts_social_graph_or_app_surveillance",
+    "post-outcome_repayment_fields"
+  ],
+  "abstention": {
+    "minimum_populated_model_features": 12,
+    "required_non_null_fields": [
+      "requested_amount"
+    ],
+    "behavior": "return abstain when event-aggregate coverage is below the minimum; missing values are imputed only for research evaluation",
+    "quality_fields_are_not_model_features": true
+  },
+  "serving_input": {
+    "format": "object with event aggregate feature names as keys; preserve feature_order",
+    "output": "predict_proba[:, 1] is adverse_90d probability",
+    "model_method": "predict_proba returns adverse_outcome_probability; caller should abstain when coverage is below the threshold"
+  },
+  "synthetic_data_notice": "All training rows are generated; this artifact is for integration and research validation, not underwriting or production performance claims.",
+  "artifact_version": "icp-challenger-2026.09.20",
+  "model_name": "icp_event_native_adverse_risk",
+  "task": "adverse_outcome_probability"
+}

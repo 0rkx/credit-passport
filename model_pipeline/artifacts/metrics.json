@@ -1,0 +1,115 @@
+{
+  "pipeline_version": "0.1.0",
+  "random_state": 20260920,
+  "data_manifest": "/Users/owaiskhan/Documents/ChatGPT/Credit Score/model_pipeline/artifacts/data_manifest.json",
+  "artifacts": {
+    "bureau_score_regressor": "/Users/owaiskhan/Documents/ChatGPT/Credit Score/model_pipeline/artifacts/lendingclub_fico_regressor.joblib",
+    "repayment_classifier": "/Users/owaiskhan/Documents/ChatGPT/Credit Score/model_pipeline/artifacts/lendingclub_default_classifier_calibrated.joblib"
+  },
+  "regression": {
+    "task": "bureau_score_regression",
+    "dataset": "Lending Club loan dataset for granting models",
+    "target": "fico_n",
+    "features": [
+      "revenue",
+      "dti_n",
+      "loan_amnt",
+      "experience_c",
+      "emp_length",
+      "purpose",
+      "home_ownership_n"
+    ],
+    "rows": {
+      "total": 1347681,
+      "train": 808608,
+      "calibration": 269536,
+      "test": 269537
+    },
+    "metrics": {
+      "mae": 26.472277773746615,
+      "rmse": 34.69978043061383,
+      "r2": 0.01523771329499457
+    },
+    "baseline_mean_predictor": {
+      "mae": 26.843679250718267,
+      "rmse": 35.39608877455959,
+      "r2": -0.02468058136013984
+    },
+    "test_target_summary": {
+      "min": 662.0,
+      "max": 847.5,
+      "mean": 702.4875694246059
+    },
+    "split": "chronological 60/20/20 by issue_d; calibration reserved for classifier only",
+    "limitations": [
+      "FICO is a US credit-bureau variable; it is not a portable Credit Passport score.",
+      "Regression excludes geography, identifiers and free text to keep the reconstruction test auditable."
+    ]
+  },
+  "classification": {
+    "task": "repayment_default_classification",
+    "dataset": "Lending Club loan dataset for granting models",
+    "target": "Default (1 = default/charged off, 0 = fully paid)",
+    "features": [
+      "revenue",
+      "dti_n",
+      "loan_amnt",
+      "fico_n",
+      "experience_c",
+      "emp_length",
+      "purpose",
+      "home_ownership_n"
+    ],
+    "rows": {
+      "total": 1347681,
+      "train": 808608,
+      "calibration": 269536,
+      "test": 269537
+    },
+    "metrics": {
+      "roc_auc": 0.666375661217181,
+      "pr_auc_average_precision": 0.3410070293787587,
+      "brier": 0.16086242981116347,
+      "expected_calibration_error_10_bins": 0.0071812646086941625
+    },
+    "baseline_constant_prevalence": {
+      "roc_auc": 0.5,
+      "pr_auc_average_precision": 0.21761019822881458,
+      "brier": 0.17138463729272915,
+      "expected_calibration_error_10_bins": 0.03359519961391097
+    },
+    "test_prevalence": 0.21761019822881458,
+    "calibration_curve_10_uniform_bins": {
+      "fraction_of_positives": [
+        0.07745085919149462,
+        0.15081777701661242,
+        0.2451856946354883,
+        0.3613762877509383,
+        0.4444691248334074,
+        0.490726429675425,
+        0.425,
+        0.4523809523809524,
+        0.3493975903614458,
+        0.24882629107981222
+      ],
+      "mean_predicted_value": [
+        0.0682370042925917,
+        0.15382798760225425,
+        0.24606416224098396,
+        0.3401458381240327,
+        0.435476503098385,
+        0.5344045176678999,
+        0.640580677922088,
+        0.747262802939812,
+        0.8494149024903345,
+        0.9771934365143317
+      ]
+    },
+    "split": "chronological 60/20/20 by issue_d; Platt sigmoid fitted only on calibration partition",
+    "limitations": [
+      "US LendingClub borrowers and 2007\u20132018 origination policy; not India or a migrant corridor.",
+      "Final outcomes are charged-off versus fully-paid, not a short-horizon default forecast.",
+      "The model is not calibrated for any production approval threshold."
+    ]
+  }
+}

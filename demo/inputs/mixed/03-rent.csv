@@ -1,0 +1,4 @@
+date,event_type,amount,currency,direction,reference,due_on,paid_on,description
+2026-07-08,rent,38000,INR,debit,MX-RENT-0708,2026-07-08,2026-07-08,Monthly home rent
+2026-08-08,rent,38000,INR,debit,MX-RENT-0808,,,Monthly home rent; due date unavailable
+2026-09-08,rent,38000,INR,debit,MX-RENT-0908,2026-09-08,2026-09-16,Monthly home rent; paid after due date

@@ -1,0 +1,19 @@
+date,event_type,amount,currency,direction,reference,description,balance_after
+2026-01-02,salary,210000,INR,credit,ST-BANK-0102,Net salary credit,310000
+2026-01-06,other,80000,INR,debit,ST-BANK-0106,Household spending,230000
+2026-01-07,savings,25000,INR,debit,ST-BANK-0107,Transfer to reserve account,205000
+2026-02-02,salary,212000,INR,credit,ST-BANK-0202,Net salary credit,417000
+2026-02-06,other,80000,INR,debit,ST-BANK-0206,Household spending,337000
+2026-02-07,savings,26000,INR,debit,ST-BANK-0207,Transfer to reserve account,311000
+2026-03-02,salary,214000,INR,credit,ST-BANK-0302,Net salary credit,525000
+2026-03-06,other,82000,INR,debit,ST-BANK-0306,Household spending,443000
+2026-03-07,savings,27000,INR,debit,ST-BANK-0307,Transfer to reserve account,416000
+2026-04-02,salary,215000,INR,credit,ST-BANK-0402,Net salary credit,631000
+2026-04-06,other,82000,INR,debit,ST-BANK-0406,Household spending,549000
+2026-04-07,savings,28000,INR,debit,ST-BANK-0407,Transfer to reserve account,521000
+2026-05-02,salary,218000,INR,credit,ST-BANK-0502,Net salary credit,739000
+2026-05-06,other,84000,INR,debit,ST-BANK-0506,Household spending,655000
+2026-05-07,savings,29000,INR,debit,ST-BANK-0507,Transfer to reserve account,626000
+2026-06-02,salary,220000,INR,credit,ST-BANK-0602,Net salary credit,846000
+2026-06-06,other,84000,INR,debit,ST-BANK-0606,Household spending,762000
+2026-06-07,savings,30000,INR,debit,ST-BANK-0607,Transfer to reserve account,732000

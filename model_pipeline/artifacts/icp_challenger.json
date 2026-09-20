@@ -1,0 +1,115 @@
+{
+  "artifact_version": "icp-challenger-2026.09.20",
+  "model_name": "icp_event_native_adverse_risk",
+  "task": "adverse_outcome_probability",
+  "feature_names": [
+    "requested_amount",
+    "active_month_count",
+    "observed_span_days",
+    "income_event_count",
+    "commitment_event_count",
+    "income_total",
+    "commitment_total",
+    "net_flow_total",
+    "obligation_to_income_ratio",
+    "income_month_count",
+    "commitment_month_count",
+    "income_regularity",
+    "commitment_on_time_rate",
+    "balance_observation_count",
+    "balance_min",
+    "balance_median",
+    "balance_last",
+    "cross_border_event_count",
+    "remittance_event_count",
+    "currency_count"
+  ],
+  "blend_weight": 0.35,
+  "risk_thresholds": {
+    "low_max": 0.2,
+    "high_min": 0.4
+  },
+  "validation_summary": {
+    "metrics": {
+      "roc_auc": 0.8519672423727032,
+      "pr_auc_average_precision": 0.7192169261668814,
+      "brier": 0.13627765426284777,
+      "expected_calibration_error_10_bins": 0.018941017732049717,
+      "calibration_curve_10_uniform_bins": {
+        "fraction_of_positives": [
+          0.04060913705583756,
+          0.16554809843400448,
+          0.25163398692810457,
+          0.3397129186602871,
+          0.4807692307692308,
+          0.6275862068965518,
+          0.576271186440678,
+          0.7843137254901961,
+          0.8823529411764706,
+          0.9016393442622951
+        ],
+        "mean_predicted_value": [
+          0.04030821379273688,
+          0.14666981575904017,
+          0.24531160953010528,
+          0.3470804670438959,
+          0.4477653779781956,
+          0.5488868836074134,
+          0.6403493417735997,
+          0.7462095599999854,
+          0.845044717015542,
+          0.9367043146030676
+        ]
+      }
+    },
+    "baseline_constant_prevalence": {
+      "roc_auc": 0.5,
+      "pr_auc_average_precision": 0.29293344289235823,
+      "brier": 0.20732155163888738,
+      "expected_calibration_error_10_bins": 0.014075180684438804,
+      "calibration_curve_10_uniform_bins": {
+        "fraction_of_positives": [
+          0.29293344289235823
+        ],
+        "mean_predicted_value": [
+          0.2788582622079129
+        ]
+      }
+    },
+    "rows": {
+      "total": 12000,
+      "train": 7147,
+      "calibration": 2419,
+      "test": 2434,
+      "calibration_eligible": 2419,
+      "test_eligible": 2434,
+      "test_abstained": 0
+    },
+    "coverage": {
+      "test_eligible_rate": 1.0,
+      "minimum_populated_model_features": 12,
+      "abstention_rule": "abstain when requested_amount is null or fewer than 12 of 20 model features are populated"
+    },
+    "split": {
+      "method": "chronological 60/20/20 by first application month",
+      "person_disjoint": true,
+      "calibration": "Platt sigmoid fitted only on the middle time partition",
+      "test_untouched_until_final_evaluation": true
+    },
+    "synthetic": true
+  },
+  "provenance": {
+    "synthetic": true,
+    "dataset": "icp_synthetic_cohort_v1",
+    "generator": "credit_passport_model.synthetic.generate_synthetic_cohort",
+    "random_state": 20260920,
+    "rows": 12000,
+    "target_definition": ">=30 days past due or adverse restructure within 90 days",
+    "model_features_are_event_native": true,
+    "quality_fields_are_not_model_features": true,
+    "notice": "Research/integration artifact only; synthetic-to-real transfer is unvalidated."
+  },
+  "feature_contract": "model_pipeline/artifacts/icp_feature_contract.json",
+  "metrics_artifact": "model_pipeline/artifacts/icp_metrics.json",
+  "model_artifact": "model_pipeline/artifacts/icp_challenger.joblib"
+}

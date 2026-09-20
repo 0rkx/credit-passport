@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "credit-passport-api"
+version = "0.1.0"
+description = "SQLite-backed FastAPI service for portable financial evidence and explainable credit assessment"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115,<1",
+  "pydantic>=2.7,<3",
+  "python-multipart>=0.0.9,<1",
+  "uvicorn[standard]>=0.30,<1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "httpx>=0.27,<1",
+  "pytest>=8,<9",
+]
+model = [
+  "joblib>=1.3,<2",
+  "numpy>=1.24,<3",
+  "pandas>=2.0,<3",
+  "scikit-learn>=1.4,<2",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.setuptools.packages.find]
+where = ["."]

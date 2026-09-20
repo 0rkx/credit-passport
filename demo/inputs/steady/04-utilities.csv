@@ -1,0 +1,7 @@
+date,event_type,amount,currency,direction,reference,due_on,paid_on,description
+2026-01-12,utility,5200,INR,debit,ST-UTIL-0112,2026-01-12,2026-01-12,Electricity and internet bill
+2026-02-12,utility,5200,INR,debit,ST-UTIL-0212,2026-02-12,2026-02-12,Electricity and internet bill
+2026-03-12,utility,5300,INR,debit,ST-UTIL-0312,2026-03-12,2026-03-12,Electricity and internet bill
+2026-04-12,utility,5300,INR,debit,ST-UTIL-0412,2026-04-12,2026-04-12,Electricity and internet bill
+2026-05-12,utility,5400,INR,debit,ST-UTIL-0512,2026-05-12,2026-05-12,Electricity and internet bill
+2026-06-12,utility,5400,INR,debit,ST-UTIL-0612,2026-06-12,2026-06-12,Electricity and internet bill

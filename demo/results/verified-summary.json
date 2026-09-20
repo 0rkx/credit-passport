@@ -1,0 +1,332 @@
+{
+  "base_url": "http://127.0.0.1:18002",
+  "cases": [
+    {
+      "applicant_id": "CP-CE87A91C7FAA",
+      "case_id": "steady-multi-source",
+      "challenger": {
+        "artifact_version": "icp-challenger-2026.09.20",
+        "blend": {
+          "blended_score": 94.0316,
+          "challenger_score": 99.6616,
+          "decision_use": "research-only",
+          "model_contribution": 34.8816,
+          "model_weight": 0.35,
+          "transparent_score": 91
+        },
+        "model_name": "icp_event_native_adverse_risk",
+        "probability": 0.003384,
+        "risk_band": "low",
+        "status": "available"
+      },
+      "decision": {
+        "score": 94.0316,
+        "status": "research-only blend available"
+      },
+      "evidence": {
+        "assertion_count": 62,
+        "corroborated_count": 0,
+        "event_types": [
+          "asset_repayment",
+          "deposit",
+          "gig_income",
+          "insurance",
+          "other",
+          "remittance",
+          "rent",
+          "salary",
+          "savings",
+          "utility"
+        ],
+        "source_count": 9,
+        "unique_event_count": 62
+      },
+      "expected_outcome": {
+        "label": "strong / low risk",
+        "review_route": "likely straightforward review",
+        "why": [
+          "Six months of regular salary plus a small, consistent platform income stream",
+          "Rent, utilities, insurance and asset instalments have explicit due and paid dates",
+          "Positive balances and reserve transfers are visible",
+          "Remittances and multiple evidence types show a clear cross-border pattern"
+        ]
+      },
+      "name": "Anika Example (demo)",
+      "observed_outcome": {
+        "risk_signal": "low",
+        "score_signal": "strong"
+      },
+      "transparent_score": {
+        "band": "High",
+        "reliability": 95,
+        "reliability_band": "High",
+        "score": 91,
+        "score_range": {
+          "p10": 88,
+          "p90": 94
+        }
+      },
+      "uploaded_sources": [
+        {
+          "file": "steady/01-bank-statement.csv",
+          "provider": "Northstar Bank (demo)",
+          "rows": 18,
+          "source_id": "SRC-A6149AB503A7",
+          "source_type": "bank-statement"
+        },
+        {
+          "file": "steady/02-payroll.csv",
+          "provider": "Northstar Employer Payroll (demo)",
+          "rows": 6,
+          "source_id": "SRC-AB8A40BD5461",
+          "source_type": "payroll"
+        },
+        {
+          "file": "steady/03-rent.csv",
+          "provider": "Harbor Homes (demo)",
+          "rows": 6,
+          "source_id": "SRC-194E9C078885",
+          "source_type": "rent"
+        },
+        {
+          "file": "steady/04-utilities.csv",
+          "provider": "Civic Utilities (demo)",
+          "rows": 6,
+          "source_id": "SRC-968DEDDA83C0",
+          "source_type": "utility"
+        },
+        {
+          "file": "steady/05-platform-earnings.csv",
+          "provider": "TutorLoop (demo)",
+          "rows": 6,
+          "source_id": "SRC-6EFFD9F593BC",
+          "source_type": "platform-earnings"
+        },
+        {
+          "file": "steady/06-remittances.csv",
+          "provider": "BridgeSend (demo)",
+          "rows": 4,
+          "source_id": "SRC-871684D568AC",
+          "source_type": "remittance"
+        },
+        {
+          "file": "steady/07-asset-repayment.csv",
+          "provider": "EquipPay (demo)",
+          "rows": 6,
+          "source_id": "SRC-5056A540E9A0",
+          "source_type": "asset-repayment"
+        },
+        {
+          "file": "steady/08-insurance.csv",
+          "provider": "Shield Mutual (demo)",
+          "rows": 6,
+          "source_id": "SRC-ED9D63CDCE32",
+          "source_type": "insurance"
+        },
+        {
+          "file": "steady/09-wallet.csv",
+          "provider": "PocketRail Wallet (demo)",
+          "rows": 4,
+          "source_id": "SRC-DD9D17E4E2B7",
+          "source_type": "wallet"
+        }
+      ]
+    },
+    {
+      "applicant_id": "CP-AF7FE44BC593",
+      "case_id": "mixed-review",
+      "challenger": {
+        "artifact_version": "icp-challenger-2026.09.20",
+        "blend": {
+          "blended_score": 73.3072,
+          "challenger_score": 92.4492,
+          "decision_use": "research-only",
+          "model_contribution": 32.3572,
+          "model_weight": 0.35,
+          "transparent_score": 63
+        },
+        "model_name": "icp_event_native_adverse_risk",
+        "probability": 0.075508,
+        "risk_band": "low",
+        "status": "available"
+      },
+      "decision": {
+        "score": 73.3072,
+        "status": "research-only blend available"
+      },
+      "evidence": {
+        "assertion_count": 11,
+        "corroborated_count": 0,
+        "event_types": [
+          "merchant_sales",
+          "other",
+          "rent",
+          "salary"
+        ],
+        "source_count": 3,
+        "unique_event_count": 11
+      },
+      "expected_outcome": {
+        "label": "mixed / manual review",
+        "review_route": "ask for more context before deciding",
+        "why": [
+          "Only three months of records are available",
+          "Income is split between salary and merchant settlements with a missed month",
+          "One rent payment has no due-date evidence and another was late",
+          "Balances stay positive, but the short and uneven history limits confidence"
+        ]
+      },
+      "name": "Rohan Example (demo)",
+      "observed_outcome": {
+        "risk_signal": "low",
+        "score_signal": "mixed"
+      },
+      "transparent_score": {
+        "band": "Medium",
+        "reliability": 57,
+        "reliability_band": "Medium",
+        "score": 63,
+        "score_range": {
+          "p10": 55,
+          "p90": 71
+        }
+      },
+      "uploaded_sources": [
+        {
+          "file": "mixed/01-bank-statement.csv",
+          "provider": "Harborline Bank (demo)",
+          "rows": 5,
+          "source_id": "SRC-DA62B1223732",
+          "source_type": "bank-statement"
+        },
+        {
+          "file": "mixed/02-merchant-sales.csv",
+          "provider": "MarketRail Settlements (demo)",
+          "rows": 3,
+          "source_id": "SRC-FB00D43AC8E6",
+          "source_type": "merchant-sales"
+        },
+        {
+          "file": "mixed/03-rent.csv",
+          "provider": "Harbor Homes (demo)",
+          "rows": 3,
+          "source_id": "SRC-A7B3DD1979B0",
+          "source_type": "rent"
+        }
+      ]
+    },
+    {
+      "applicant_id": "CP-8B60DFF0255A",
+      "case_id": "weak-stressed",
+      "challenger": {
+        "artifact_version": "icp-challenger-2026.09.20",
+        "blend": {
+          "blended_score": 32.7798,
+          "challenger_score": 2.6567,
+          "decision_use": "research-only",
+          "model_contribution": 0.9298,
+          "model_weight": 0.35,
+          "transparent_score": 49
+        },
+        "model_name": "icp_event_native_adverse_risk",
+        "probability": 0.973433,
+        "risk_band": "high",
+        "status": "available"
+      },
+      "decision": {
+        "score": 32.7798,
+        "status": "research-only blend available"
+      },
+      "evidence": {
+        "assertion_count": 36,
+        "corroborated_count": 0,
+        "event_types": [
+          "asset_repayment",
+          "gig_income",
+          "other",
+          "rent",
+          "salary",
+          "utility"
+        ],
+        "source_count": 6,
+        "unique_event_count": 36
+      },
+      "expected_outcome": {
+        "label": "weak / high risk",
+        "review_route": "needs remediation or a smaller exposure",
+        "why": [
+          "Pay declines across the six-month window and platform income is sporadic",
+          "Rent, utilities and equipment instalments consume most observed inflows",
+          "Several obligations are paid after their due dates",
+          "The bank balance becomes negative and no reserve, insurance or remittance buffer is observed"
+        ]
+      },
+      "name": "Dev Example (demo)",
+      "observed_outcome": {
+        "risk_signal": "high",
+        "score_signal": "mixed"
+      },
+      "transparent_score": {
+        "band": "Low",
+        "reliability": 95,
+        "reliability_band": "High",
+        "score": 49,
+        "score_range": {
+          "p10": 46,
+          "p90": 52
+        }
+      },
+      "uploaded_sources": [
+        {
+          "file": "weak/01-bank-statement.csv",
+          "provider": "Harborline Bank (demo)",
+          "rows": 12,
+          "source_id": "SRC-CF22311BD327",
+          "source_type": "bank-statement"
+        },
+        {
+          "file": "weak/02-payroll.csv",
+          "provider": "Contractor Payroll Desk (demo)",
+          "rows": 3,
+          "source_id": "SRC-ED382F684C9C",
+          "source_type": "payroll"
+        },
+        {
+          "file": "weak/03-platform-earnings.csv",
+          "provider": "QuickRoute Deliveries (demo)",
+          "rows": 3,
+          "source_id": "SRC-049359817330",
+          "source_type": "platform-earnings"
+        },
+        {
+          "file": "weak/04-rent.csv",
+          "provider": "Harbor Homes (demo)",
+          "rows": 6,
+          "source_id": "SRC-574F0A13D5BD",
+          "source_type": "rent"
+        },
+        {
+          "file": "weak/05-utilities.csv",
+          "provider": "Civic Utilities (demo)",
+          "rows": 6,
+          "source_id": "SRC-5C13723CFC54",
+          "source_type": "utility"
+        },
+        {
+          "file": "weak/06-asset-repayment.csv",
+          "provider": "EquipPay (demo)",
+          "rows": 6,
+          "source_id": "SRC-B309451E923F",
+          "source_type": "asset-repayment"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-09-20T01:20:50.464064+00:00",
+  "schema_version": "credit-passport-demo-run-1",
+  "validation": {
+    "checked_files": 18,
+    "checked_rows": 109,
+    "status": "passed"
+  }
+}

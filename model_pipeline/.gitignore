@@ -1,0 +1,11 @@
+data/raw/*
+!data/raw/.gitkeep
+artifacts/*.joblib
+!artifacts/icp_challenger.joblib
+artifacts/*.pkl
+artifacts/*.pickle
+__pycache__/
+.pytest_cache/
+*.egg-info/
+.venv/
+*.py[cod]

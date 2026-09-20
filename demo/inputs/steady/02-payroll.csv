@@ -1,0 +1,7 @@
+date,event_type,amount,currency,direction,reference,description
+2026-01-27,salary,235000,INR,credit,ST-PAY-0127,Employer payroll gross record before deductions
+2026-02-27,salary,237000,INR,credit,ST-PAY-0227,Employer payroll gross record before deductions
+2026-03-27,salary,239000,INR,credit,ST-PAY-0327,Employer payroll gross record before deductions
+2026-04-27,salary,240000,INR,credit,ST-PAY-0427,Employer payroll gross record before deductions
+2026-05-27,salary,243000,INR,credit,ST-PAY-0527,Employer payroll gross record before deductions
+2026-06-27,salary,245000,INR,credit,ST-PAY-0627,Employer payroll gross record before deductions

@@ -1,0 +1,6 @@
+date,event_type,amount,currency,direction,reference,description,balance_after
+2026-07-03,salary,120000,INR,credit,MX-BANK-0703,Salary credit,132000
+2026-07-12,other,45000,INR,debit,MX-BANK-0712,Household spending,87000
+2026-08-04,other,70000,INR,debit,MX-BANK-0804,Household spending,17000
+2026-09-03,salary,155000,INR,credit,MX-BANK-0903,Salary credit,172000
+2026-09-12,other,60000,INR,debit,MX-BANK-0912,Household spending,112000

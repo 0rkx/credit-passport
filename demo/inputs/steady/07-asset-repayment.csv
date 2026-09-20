@@ -1,0 +1,7 @@
+date,event_type,amount,currency,direction,reference,due_on,paid_on,description
+2026-01-18,asset_repayment,12000,INR,debit,ST-ASSET-0118,2026-01-18,2026-01-18,Equipment instalment
+2026-02-18,asset_repayment,12000,INR,debit,ST-ASSET-0218,2026-02-18,2026-02-18,Equipment instalment
+2026-03-18,asset_repayment,12000,INR,debit,ST-ASSET-0318,2026-03-18,2026-03-18,Equipment instalment
+2026-04-18,asset_repayment,12000,INR,debit,ST-ASSET-0418,2026-04-18,2026-04-18,Equipment instalment
+2026-05-18,asset_repayment,12000,INR,debit,ST-ASSET-0518,2026-05-18,2026-05-18,Equipment instalment
+2026-06-18,asset_repayment,12000,INR,debit,ST-ASSET-0618,2026-06-18,2026-06-18,Equipment instalment

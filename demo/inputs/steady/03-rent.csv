@@ -1,0 +1,7 @@
+date,event_type,amount,currency,direction,reference,due_on,paid_on,description
+2026-01-08,rent,42000,INR,debit,ST-RENT-0108,2026-01-08,2026-01-08,Monthly home rent
+2026-02-08,rent,42000,INR,debit,ST-RENT-0208,2026-02-08,2026-02-08,Monthly home rent
+2026-03-08,rent,42000,INR,debit,ST-RENT-0308,2026-03-08,2026-03-08,Monthly home rent
+2026-04-08,rent,42000,INR,debit,ST-RENT-0408,2026-04-08,2026-04-08,Monthly home rent
+2026-05-08,rent,42000,INR,debit,ST-RENT-0508,2026-05-08,2026-05-08,Monthly home rent
+2026-06-08,rent,42000,INR,debit,ST-RENT-0608,2026-06-08,2026-06-08,Monthly home rent

@@ -1,0 +1,154 @@
+[
+  {
+    "id": "rbi-accounts-non-residents-2025",
+    "title": "Accounts in India by Non-residents",
+    "publisher": "Reserve Bank of India",
+    "url": "https://www.rbi.org.in/commonman/Upload/English/FAQs/PDFs/Accountresidents16012025.pdf",
+    "locator": "RBI FAQ dated 16 January 2025, Q1-Q3 and change-of-status section",
+    "last_reviewed": "2026-09-20",
+    "topics": [
+      "nri", "nre", "nro", "fcnr", "fcnr-b", "rfc", "account-choice",
+      "account-conversion", "moving-abroad", "returning-india", "repatriation",
+      "resident-account", "non-resident-account"
+    ],
+    "intents": [
+      "moving-abroad", "returning-india", "account-choices", "account-conversion", "general"
+    ],
+    "summary": "RBI's comparison of NRE, FCNR(B) and NRO accounts, including permitted credits and debits, repatriability, and what to ask about when residential status changes.",
+    "key_points": [
+      "NRE accounts are rupee accounts for NRIs and PIOs; balances are generally repatriable subject to the applicable rules.",
+      "FCNR(B) accounts are foreign-currency term deposits for eligible non-residents, with permitted currencies and tenor rules set by the current framework.",
+      "NRO accounts are rupee accounts for a person resident outside India to handle bona fide rupee transactions and Indian income; interest is taxable and remittances are subject to the applicable conditions.",
+      "When a resident Indian becomes a person resident outside India, the existing resident account should be designated as NRO.",
+      "When a non-resident returns or residential status changes, NRE accounts should be designated resident or may be transferred to RFC at the holder's option; FCNR(B) deposits may continue to maturity if permitted, and NRO accounts may be designated resident when the holder intends to stay in India for an uncertain period.",
+      "The bank or authorised dealer should confirm the account action, documents and any repatriation conditions for the person's facts."
+    ]
+  },
+  {
+    "id": "fema-deposit-regulations-2016",
+    "title": "Foreign Exchange Management (Deposit) Regulations, 2016",
+    "publisher": "Reserve Bank of India",
+    "url": "https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=10382",
+    "locator": "Notification No. FEMA 5(R)/2016-RB, amended through 14 August 2024",
+    "last_reviewed": "2026-09-20",
+    "topics": [
+      "nri", "nre", "nro", "fcnr", "rfc", "fema", "account-choice",
+      "account-conversion", "repatriation", "authorised-dealer"
+    ],
+    "intents": [
+      "moving-abroad", "returning-india", "account-choices", "account-conversion", "residential-status"
+    ],
+    "summary": "The FEMA deposit regulations define the relevant account types and set the governing framework for deposits between residents and people resident outside India.",
+    "key_points": [
+      "The regulations define NRI, NRE, NRO and FCNR(B) account terms and identify the authorised bank or authorised dealer that handles the account.",
+      "Account eligibility and permitted transactions depend on the person's FEMA status, account type and the applicable regulation in force at the time.",
+      "An authorised dealer should be used for account redesignation, conversion and repatriation questions rather than relying on an account label alone."
+    ]
+  },
+  {
+    "id": "fema-act-1999",
+    "title": "FEMA residence definitions",
+    "publisher": "Reserve Bank of India",
+    "url": "https://www.rbi.org.in/scripts/BS_ViewMasterDirections.aspx?id=10191",
+    "locator": "Master Direction, section 1.4, adopting FEMA sections 2(v) and 2(w)",
+    "last_reviewed": "2026-09-20",
+    "topics": [
+      "fema", "residential-status", "resident", "non-resident", "moving-abroad",
+      "returning-india", "employment-abroad", "business-abroad"
+    ],
+    "intents": [
+      "moving-abroad", "returning-india", "residential-status", "account-conversion", "general"
+    ],
+    "summary": "FEMA provides the foreign-exchange definition of residence. It is a separate question from income-tax residence and must be assessed against the statutory facts.",
+    "key_points": [
+      "FEMA uses the statutory concepts of a person resident in India and a person resident outside India; the analysis is not the same as an income-tax residency test.",
+      "Purpose and expected duration of a person's stay, including employment or business outside India, can matter to the FEMA analysis.",
+      "A move, return or job change should be discussed with the authorised dealer using the person's dates, purpose and intended stay; the guide does not determine legal status from one fact."
+    ]
+  },
+  {
+    "id": "income-tax-residential-status-2025",
+    "title": "Non-resident: residential status FAQs",
+    "publisher": "Income Tax Department, Government of India",
+    "url": "https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/non-resident",
+    "locator": "Non-resident FAQ, questions 1-13; tax years beginning on or after 1 April 2026 use the Income Tax Act, 2025",
+    "last_reviewed": "2026-09-20",
+    "topics": [
+      "income-tax", "tax-residency", "residential-status", "day-count", "days-in-india",
+      "moving-abroad", "returning-india", "employment-abroad", "nor", "deemed-resident"
+    ],
+    "intents": [
+      "moving-abroad", "returning-india", "residential-status", "job-change", "general"
+    ],
+    "summary": "The Income Tax Department explains that tax residency is assessed for each tax year using day-count and special statutory rules; it should not be inferred from an NRE or NRO label.",
+    "key_points": [
+      "For tax years beginning on or after 1 April 2026, the department says the basic individual test remains 182 days or more in India, or 60 days or more in the year together with 365 days or more in the preceding four years, subject to the statutory exceptions.",
+      "A citizen leaving India for employment outside India has a special rule described in the official FAQ; the person's facts and the relevant tax year still need to be checked.",
+      "Additional rules can apply to visiting citizens or persons of Indian origin with more than Rs 15 lakh of income other than foreign-source income, deemed residency, and not-ordinarily-resident status.",
+      "Tax residency is determined separately for each tax year. A bank account type is not a substitute for that analysis."
+    ]
+  },
+  {
+    "id": "rbi-kyc-direction-2016-2024",
+    "title": "Master Direction - Know Your Customer (KYC) Direction, 2016",
+    "publisher": "Reserve Bank of India",
+    "url": "https://www.rbi.org.in/commonman/Upload/English/Notification/PDFs/MD18KYCF6E92C82E1E1419D87323E3869BC9F13.pdf",
+    "locator": "Master Direction updated 6 November 2024; customer due diligence and customer identification provisions",
+    "last_reviewed": "2026-09-20",
+    "topics": [
+      "kyc", "customer-identification", "address", "pan", "account-update",
+      "account-conversion", "nri", "fatca", "crs"
+    ],
+    "intents": [
+      "moving-abroad", "returning-india", "account-conversion", "kyc-fatca-crs", "general"
+    ],
+    "summary": "RBI's KYC direction sets customer identification and due-diligence expectations for regulated entities; the bank's current checklist depends on the account and customer facts.",
+    "key_points": [
+      "Banks and other regulated entities apply customer identification and due-diligence procedures when opening or maintaining an account.",
+      "A change in address, residence, tax details or identity information can trigger a request to update customer records; the bank should confirm the exact documents and channel.",
+      "For NRI or returning-customer cases, ask the bank which documents need certification, whether a current overseas address is required, and whether the account should be redesignated."
+    ]
+  },
+  {
+    "id": "income-tax-fatca-crs",
+    "title": "Guidance Note for FATCA and CRS",
+    "publisher": "Income Tax Department, Government of India",
+    "url": "https://www.incometaxindia.gov.in/documents/20117/14614766/Guidance-Note-for-FATCA-and-CRS-15-01-2016.pdf/6ca2f3b3-1fc9-e35b-c008-aff156298df4?t=1767815488101",
+    "locator": "Guidance Note, due diligence and self-certification sections",
+    "last_reviewed": "2026-09-20",
+    "topics": [
+      "fatca", "crs", "tax-residency", "tax-identification-number", "self-certification",
+      "reportable-account", "kyc", "account-update"
+    ],
+    "intents": [
+      "moving-abroad", "returning-india", "kyc-fatca-crs", "residential-status", "account-conversion"
+    ],
+    "summary": "The official guidance explains the financial institution's FATCA and CRS due-diligence and reporting framework, including tax-residency self-certification.",
+    "key_points": [
+      "A financial institution may ask for tax-residency information, jurisdiction(s) of tax residence and a tax identification number or equivalent where applicable.",
+      "Self-certification and due-diligence requirements differ by account and customer circumstances; use the bank's current form and instructions.",
+      "A change in country of residence or tax details should be reported to the relevant financial institution so its records can be reviewed."
+    ]
+  },
+  {
+    "id": "rbi-foreign-currency-accounts-2025",
+    "title": "Foreign Currency Accounts by Resident Individuals",
+    "publisher": "Reserve Bank of India",
+    "url": "https://www.rbi.org.in/commonman/Upload/English/FAQs/PDFs/CurrencyAccounts16012025.pdf",
+    "locator": "RBI FAQ dated 16 January 2025, questions on RFC and foreign-currency accounts",
+    "last_reviewed": "2026-09-20",
+    "topics": [
+      "rfc", "foreign-currency", "returning-india", "resident", "fcnr", "nre",
+      "account-choice", "account-conversion"
+    ],
+    "intents": [
+      "returning-india", "account-choices", "account-conversion", "general"
+    ],
+    "summary": "RBI's resident foreign-currency account FAQ gives context for foreign-currency accounts that may matter after a person returns to India.",
+    "key_points": [
+      "A Resident Foreign Currency account is a resident-side foreign-currency account with eligibility and permitted-credit rules that depend on the applicable FEMA framework.",
+      "On return to India, the bank should confirm whether an RFC account is available and whether NRE or FCNR(B) balances can be moved under the current rules.",
+      "The account's currency, source of funds and intended use matter; do not assume that any foreign-currency balance can be moved without the bank's review."
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+{
+  "generated_by": "credit_passport_model_pipeline",
+  "datasets": {
+    "lendingclub": {
+      "name": "lendingclub",
+      "url": "https://zenodo.org/api/records/11295916/files/LC_loans_granting_model_dataset.csv/content",
+      "sha256": "207d65b2712f775a91404496ab27c786ac0da6b0f977f849e6d5d8149e925acc",
+      "filename": "lendingclub_loans.csv",
+      "source_page": "https://zenodo.org/records/11295916",
+      "license_or_access": "CC BY 4.0 (Zenodo record 10.5281/zenodo.11295916)",
+      "geography": "United States; LendingClub loans issued 2007\u20132018",
+      "rows_expected": 1347681,
+      "local_path": "/Users/owaiskhan/Documents/ChatGPT/Credit Score/model_pipeline/data/raw/lendingclub_loans.csv",
+      "sha256_verified": "207d65b2712f775a91404496ab27c786ac0da6b0f977f849e6d5d8149e925acc"
+    },
+    "heloc": {
+      "name": "heloc",
+      "url": "https://raw.githubusercontent.com/ZhangXinyiCindy/FICO-Explainable-ML-Challenge-HELOC-Dataset/d4c6f7736b3b42ffb0da7c24e93411b76de0f848/HelocData.csv",
+      "sha256": "6daaf54b11d695b9fe7eaede1b0321373877b170c11869a3dd12cbb09d9c7a53",
+      "filename": "heloc.csv",
+      "source_page": "https://community.fico.com/s/explainable-machine-learning-challenge",
+      "license_or_access": "Public FICO challenge data via a pinned GitHub mirror; the mirror does not publish an explicit license",
+      "geography": "Anonymised US homeowners applying for a HELOC",
+      "rows_expected": 10459,
+      "local_path": "/Users/owaiskhan/Documents/ChatGPT/Credit Score/model_pipeline/data/raw/heloc.csv",
+      "sha256_verified": "6daaf54b11d695b9fe7eaede1b0321373877b170c11869a3dd12cbb09d9c7a53"
+    }
+  }
+}
