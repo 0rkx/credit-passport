@@ -1,10 +1,9 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
   ArrowRight,
-  BadgeCheck,
   BarChart3,
   BriefcaseBusiness,
   Check,
@@ -72,14 +71,13 @@ import {
 } from "@/lib/credit-passport";
 
 type Mode = "applicant" | "lender";
-type View = "home" | "evidence" | "score" | "transition" | "guide" | "queue" | "case" | "validation";
+type View = "home" | "evidence" | "score" | "transition" | "queue" | "case" | "validation";
 
 const navApplicant = [
   { id: "home" as View, label: "Home", icon: LayoutList },
   { id: "evidence" as View, label: "My evidence", icon: Database },
   { id: "score" as View, label: "My score", icon: Gauge },
   { id: "transition" as View, label: "Moving or returning", icon: Waypoints },
-  { id: "guide" as View, label: "Guide", icon: MessageCircle },
 ];
 
 const navLender = [
@@ -87,7 +85,6 @@ const navLender = [
   { id: "case" as View, label: "Applicant", icon: UserRound },
   { id: "evidence" as View, label: "Evidence", icon: Database },
   { id: "score" as View, label: "Score", icon: Gauge },
-  { id: "guide" as View, label: "Guide", icon: MessageCircle },
   { id: "validation" as View, label: "Score quality", icon: BarChart3 },
 ];
 
@@ -103,14 +100,100 @@ function errorMessage(error: unknown): string {
 function statusFor(applicant: Applicant): { label: string; className: string } {
   if (applicant.score === null) return { label: "Evidence needed", className: "border-amber-200 bg-amber-50 text-amber-800" };
   if (applicant.reliability >= 75) return { label: "Review ready", className: "border-teal-200 bg-teal-50 text-teal-800" };
-  return { label: "Check evidence", className: "border-orange-200 bg-orange-50 text-orange-800" };
+  return { label: "Check evidence", className: "border-amber-200 bg-amber-50 text-amber-800" };
 }
 
 function scoreBand(score: number | null): { label: string; className: string } {
   if (score === null) return { label: "Not scored", className: "border-slate-300 bg-slate-100 text-slate-700" };
   if (score >= 75) return { label: "Strong", className: "border-teal-200 bg-teal-50 text-teal-800" };
-  if (score >= 60) return { label: "Review", className: "border-amber-200 bg-amber-50 text-amber-800" };
+  if (score >= 60) return { label: "Needs review", className: "border-amber-200 bg-amber-50 text-amber-800" };
   return { label: "Limited", className: "border-rose-200 bg-rose-50 text-rose-800" };
+}
+
+function scoreTone(value: number, evidenceStrength: number): { barColor: string; valueClass: string } {
+  if (evidenceStrength === 0) return { barColor: "#c58a1b", valueClass: "text-[#94640f]" };
+  if (value >= 75) return { barColor: "#16836d", valueClass: "text-[#116b5c]" };
+  if (value >= 60) return { barColor: "#c58a1b", valueClass: "text-[#94640f]" };
+  return { barColor: "#c94a4a", valueClass: "text-[#b42318]" };
+}
+
+function countLabel(value: number, singular: string, plural = `${singular}s`): string {
+  return `${value} ${value === 1 ? singular : plural}`;
+}
+
+function domainExplanation(domain: ScoreResponse["domains"][number]): { why: string; effect: string } {
+  const message = domain.reason_codes[0]?.message ?? "The available records provide a limited picture for this area.";
+  const noEvidence = domain.reliability === 0;
+  let why = noEvidence ? "No records were found for this area." : "The available records provide a mixed picture for this area.";
+
+  if (!noEvidence && domain.key === "commitment") {
+    const scheduled = message.match(/(\d+) of (\d+) scheduled commitments were paid/i);
+    const observed = message.match(/(\d+) commitment payment\(s\) were observed across (\d+) month\(s\)/i);
+    if (scheduled) {
+      const onTime = Number(scheduled[1]);
+      const total = Number(scheduled[2]);
+      const percentage = total ? Math.round((onTime / total) * 100) : 0;
+      why = `${countLabel(onTime, "scheduled payment")} out of ${total} were on time (${percentage}%).`;
+    } else if (observed) {
+      why = `We found ${countLabel(Number(observed[1]), "recurring payment")} across ${observed[2]} months, but the records did not include due dates to check timing.`;
+    } else {
+      why = "No recurring payments with usable timing information were found.";
+    }
+  } else if (!noEvidence && domain.key === "income") {
+    const income = message.match(/(\d+) observed income month\(s\); recurring inflows are (\d+)% consistent/i);
+    if (income) why = `Income appeared across ${income[1]} months, and recurring amounts were ${income[2]}% consistent.`;
+    else why = "The records did not show enough regular income to assess stability clearly.";
+  } else if (!noEvidence && domain.key === "capacity") {
+    const capacity = message.match(/commitment outflows were (\d+)% of classified income inflows/i);
+    if (capacity) {
+      const committed = Number(capacity[1]);
+      const remaining = Math.max(0, 100 - committed);
+      why = `Regular commitments used ${committed}% of classified income, leaving about ${remaining}% before other spending.`;
+    } else if (/no inflows could be classified/i.test(message)) {
+      why = "Commitments were present, but the records did not identify usable income, so this area stayed neutral.";
+    } else {
+      why = "There was not enough usable income and payment information to assess room for new payments.";
+    }
+  } else if (!noEvidence && domain.key === "liquidity") {
+    const liquidity = message.match(/(\d+) of (\d+) observed month\(s\) had non-negative net flow/i);
+    if (liquidity) why = `Money was left after spending in ${liquidity[1]} of ${liquidity[2]} observed months.`;
+    else why = "The records did not show enough balance or spending history to assess the cash buffer clearly.";
+  } else if (!noEvidence && domain.key === "shock") {
+    const shock = message.match(/Observed (\d+) reserve\/deposit event\(s\) and (\d+) protection payment\(s\)/i);
+    if (shock) {
+      const reserves = Number(shock[1]);
+      const protection = Number(shock[2]);
+      why = reserves || protection
+        ? `The records show ${countLabel(reserves, "reserve or deposit event")} and ${countLabel(protection, "protection payment")}.`
+        : "No reserve, deposit or protection-payment activity was found.";
+    } else {
+      why = "The records did not show reserves, protection payments or another clear buffer for disruption.";
+    }
+  } else if (!noEvidence && domain.key === "momentum") {
+    const momentum = message.match(/([+-]?\d+)% from early to late observed income/i);
+    if (momentum) {
+      const change = Number(momentum[1]);
+      why = `Income ${change < 0 ? "fell" : "rose"} ${Math.abs(change)}% from the early period to the late period.`;
+    } else if (/one observed month/i.test(message)) {
+      why = "Only one month of income was available, so a trend could not be established.";
+    } else {
+      why = "The records did not show enough income history to establish a clear trend.";
+    }
+  } else if (!noEvidence && domain.key === "cross_border") {
+    const crossBorder = message.match(/(\d+) cross-border event\(s\) across (\d+) month\(s\) and (\d+) currency/i);
+    if (crossBorder) why = `We found ${countLabel(Number(crossBorder[1]), "cross-border transfer")} across ${crossBorder[2]} months and ${crossBorder[3]} currencies.`;
+    else if (/no cross-border transfer events/i.test(message)) why = "No cross-border transfers were found to add support in this area.";
+    else why = "The records showed limited cross-border activity for this area.";
+  }
+
+  const effect = noEvidence
+    ? `This area is ${domain.weight}% of the passport score. No records were found, so this stayed neutral.`
+    : domain.adjusted >= 75
+    ? `This area is ${domain.weight}% of the passport score and helped the result.`
+    : domain.adjusted >= 60
+      ? `This area is ${domain.weight}% of the passport score and needs attention.`
+      : `This area is ${domain.weight}% of the passport score and pulled the result down.`;
+  return { why, effect };
 }
 
 function HelpTip({ label, children, className = "text-[#6f8093]" }: { label: string; children: React.ReactNode; className?: string }) {
@@ -120,6 +203,7 @@ function HelpTip({ label, children, className = "text-[#6f8093]" }: { label: str
         <button
           type="button"
           aria-label={`More about ${label}`}
+          onClick={(event) => event.stopPropagation()}
           className={`inline-grid size-5 shrink-0 place-items-center rounded-full transition hover:bg-[#edf2f7] hover:text-[#2f61c5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2f61c5] focus-visible:ring-offset-1 ${className}`}
         >
           <CircleHelp className="size-3.5" aria-hidden="true" />
@@ -222,19 +306,20 @@ function UploadStatementDialog({ applicant, config, onUploaded }: { applicant: A
   const [provider, setProvider] = useState("");
   const [sourceType, setSourceType] = useState("bank-statement");
   const [currency, setCurrency] = useState(applicant.currency);
+  const [consent, setConsent] = useState(false);
   const [pending, setPending] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
-    if (!file) return;
+    if (!file || !provider || !consent) return;
     setPending(true);
     setError(null);
     setResult(null);
     try {
       const response = await creditPassportApi.uploadStatement(applicant.id, file, { provider, sourceType, currency });
-      setResult(`${response.parsed_rows.toLocaleString("en-IN")} rows accepted and scored.`);
+      setResult(response.parsed_rows.toLocaleString("en-IN") + " records added.");
       onUploaded();
     } catch (cause) {
       setError(errorMessage(cause));
@@ -249,29 +334,34 @@ function UploadStatementDialog({ applicant, config, onUploaded }: { applicant: A
       setResult(null);
       setError(null);
       setFile(null);
+      setProvider("");
+      setSourceType("bank-statement");
+      setCurrency(applicant.currency);
+      setConsent(false);
     }
   }
 
   return (
     <Dialog open={open} onOpenChange={close}>
-      <DialogTrigger asChild><Button className="bg-[#2f61c5] hover:bg-[#244fa5]"><Upload /> Add complete statement</Button></DialogTrigger>
-      <DialogContent className="max-w-lg">
+      <DialogTrigger asChild><Button className="bg-[#2f61c5] hover:bg-[#244fa5]"><Upload /> Add records</Button></DialogTrigger>
+      <DialogContent className="max-w-md">
         <form onSubmit={submit}>
-          <DialogHeader><DialogTitle>Add a complete statement</DialogTitle><DialogDescription className="sr-only">Upload a CSV financial statement.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>Add records</DialogTitle><DialogDescription className="sr-only">Upload a complete CSV file from one financial source.</DialogDescription></DialogHeader>
           {result ? (
-            <div className="mt-5 rounded-lg border border-teal-200 bg-teal-50 p-5"><FileCheck2 className="size-7 text-teal-700" /><p className="mt-3 font-semibold text-teal-900">Statement processed</p><p className="mt-1 text-sm text-teal-800">{result}</p></div>
+            <div className="mt-5 rounded-lg border border-teal-200 bg-teal-50 p-5"><FileCheck2 className="size-7 text-teal-700" /><p className="mt-3 font-semibold text-teal-900">Records added</p><p className="mt-1 text-sm text-teal-800">{result}</p></div>
           ) : (
             <div className="mt-5 space-y-4">
+              <label><span className="mb-1.5 block text-sm font-semibold">Source type</span><select className={inputClass} value={sourceType} onChange={(e) => setSourceType(e.target.value)}>{config.evidence_types.map((type) => <option key={type} value={type}>{evidenceTypeLabel(type)}</option>)}</select></label>
               <label><span className="mb-1.5 block text-sm font-semibold">Provider</span><input required placeholder="Bank or source name" className={inputClass} value={provider} onChange={(e) => setProvider(e.target.value)} /></label>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label><span className="mb-1.5 block text-sm font-semibold">Evidence type</span><select className={inputClass} value={sourceType} onChange={(e) => setSourceType(e.target.value)}>{config.evidence_types.map((type) => <option key={type} value={type}>{evidenceTypeLabel(type)}</option>)}</select></label>
+              <div className="grid gap-4 sm:grid-cols-[1fr_120px]">
+                <label><span className="mb-1.5 block text-sm font-semibold">Full CSV file</span><input required type="file" accept=".csv,text/csv" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="block w-full rounded-md border border-[#ccd6df] bg-[#f8fafb] p-3 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-[#eaf0fb] file:px-3 file:py-2 file:font-semibold file:text-[#2f61c5]" /></label>
                 <label><span className="mb-1.5 block text-sm font-semibold">Currency</span><input required maxLength={3} className={inputClass} value={currency} onChange={(e) => setCurrency(e.target.value.toUpperCase())} /></label>
               </div>
-              <label><span className="mb-1.5 block text-sm font-semibold">CSV statement</span><input required type="file" accept=".csv,text/csv" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="block w-full rounded-md border border-[#ccd6df] bg-[#f8fafb] p-3 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-[#eaf0fb] file:px-3 file:py-2 file:font-semibold file:text-[#2f61c5]" /><span className="mt-2 block text-xs leading-5 text-[#718198]">Required columns: date and amount. PDF and XLSX are rejected rather than silently accepted.</span></label>
+              <label className="flex items-start gap-3 rounded-md border border-[#dbe3ea] bg-[#f8fafb] p-3 text-sm leading-5"><input required type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1 size-4 accent-[#2f61c5]" /><span>I have permission to share this file.</span></label>
             </div>
           )}
           {error ? <p className="mt-4 rounded-md border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">{error}</p> : null}
-          <DialogFooter className="mt-6">{!result ? <Button type="submit" disabled={!file || !provider || pending} className="bg-[#2f61c5] hover:bg-[#244fa5]">{pending ? <LoaderCircle className="animate-spin" /> : <Upload />} {pending ? "Processing…" : "Process statement"}</Button> : <Button type="button" onClick={() => close(false)}>Done</Button>}</DialogFooter>
+          <DialogFooter className="mt-6">{!result ? <Button type="submit" disabled={!file || !provider || !consent || pending} className="bg-[#2f61c5] hover:bg-[#244fa5]">{pending ? <LoaderCircle className="animate-spin" /> : <Upload />} {pending ? "Uploading…" : "Upload"}</Button> : <Button type="button" onClick={() => close(false)}>Done</Button>}</DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
@@ -329,9 +419,48 @@ function HomeView({ applicant, evidence, score, config, onNavigate, onRefresh }:
 }
 
 function EvidenceView({ applicant, evidence, config, onRefresh }: { applicant: Applicant; evidence: EvidenceResponse; config: ConfigResponse; onRefresh: () => void }) {
-  const visibleEvents = evidence.events.slice(0, 50);
-  const humanize = (value: string) => value.replaceAll("_", " ").replaceAll("-", " ");
-  return <><SectionHeading eyebrow={applicant.id} title="Financial records" detail="Sources are checked for completeness and matching activity is counted once. This keeps the score from counting the same behaviour twice." action={<UploadStatementDialog applicant={applicant} config={config} onUploaded={onRefresh} />} /><div className="mb-6 grid gap-4 sm:grid-cols-3"><Metric label="Records received" value={String(evidence.assertion_count)} note={`Across ${evidence.sources.length} connected source${evidence.sources.length === 1 ? "" : "s"}.`} /><Metric label="Activity records" value={String(evidence.unique_event_count)} note="Repeated rows that describe the same activity are counted once." /><Metric label="Matching records" value={String(evidence.corroborated_count)} note="Records from more than one source that support the same activity." /></div><section className="rounded-xl border border-[#dbe3ea] bg-white"><div className="border-b border-[#e5eaee] px-5 py-4"><h2 className="font-semibold text-[#182b3a]">Connected sources</h2></div>{evidence.sources.length ? <div className="grid md:grid-cols-2">{evidence.sources.map((source) => <div key={source.id} className="border-b border-r border-[#edf0f3] p-5"><div className="flex items-start justify-between gap-4"><div><p className="font-semibold text-[#263a4b]">{evidenceTypeLabel(source.source_type)}</p><p className="mt-1 text-sm text-[#718198]">{source.provider}</p></div><BadgeCheck aria-label="Source connected" className="size-5 text-[#008b78]" /></div><div className="mt-5 grid grid-cols-3 gap-3 text-sm"><div><p className="font-semibold tabular-nums">{source.assertion_count}</p><p className="text-xs text-[#8290a2]">records</p></div><div><p className="font-semibold tabular-nums">{source.unique_event_count}</p><p className="text-xs text-[#8290a2]">activity</p></div><div><p className="font-semibold tabular-nums">{source.corroborated_count}</p><p className="text-xs text-[#8290a2]">matches</p></div></div><p className="mt-4 text-xs text-[#8290a2]">Covers {formatDate(source.period_start)} – {formatDate(source.period_end)}</p></div>)}</div> : <div className="p-10 text-center text-[#718198]">No connected sources yet.</div>}</section><section className="mt-6 overflow-hidden rounded-xl border border-[#dbe3ea] bg-white"><div className="flex items-center justify-between border-b border-[#e5eaee] px-5 py-4"><h2 className="font-semibold text-[#182b3a]">Activity</h2><p className="text-xs font-medium text-[#718198]">Showing {visibleEvents.length} of {evidence.events.length}</p></div><div className="overflow-x-auto"><table className="w-full min-w-[760px] text-left text-sm"><thead className="bg-[#f5f8fa] text-xs uppercase tracking-wide text-[#718198]"><tr><th className="px-5 py-3">Date</th><th className="px-4 py-3">Activity</th><th className="px-4 py-3">Amount</th><th className="px-4 py-3">Category</th><th className="px-4 py-3">Source match</th></tr></thead><tbody>{visibleEvents.map((event) => <tr key={event.id} className="border-t border-[#edf0f3]"><td className="px-5 py-4 text-[#6d7b8e]">{formatDate(event.date)}</td><td className="px-4 py-4"><p className="font-semibold capitalize text-[#263a4b]">{humanize(event.event_type)}</p><p className="mt-1 text-xs text-[#7f8da0]">{event.reference ?? event.id}</p></td><td className="px-4 py-4 font-medium tabular-nums">{formatMoney(event.amount, event.currency)}</td><td className="px-4 py-4 capitalize">{humanize(event.construct)}</td><td className="px-4 py-4 text-xs text-[#52657a]">{event.source_ids.length > 1 ? `${event.source_ids.length} matching sources` : "One source"}</td></tr>)}{!visibleEvents.length ? <tr><td colSpan={5} className="px-5 py-12 text-center text-[#718198]">No activity yet.</td></tr> : null}</tbody></table></div></section></>;
+  const dateRange = evidence.sources.length
+    ? formatDate(evidence.sources.map((source) => source.period_start).sort()[0]) + " – " + formatDate(evidence.sources.map((source) => source.period_end).sort().at(-1))
+    : "Not available";
+
+  return (
+    <div className="mx-auto max-w-[1120px]">
+      <SectionHeading eyebrow="Credit Passport" title="My evidence" />
+      <section className="mb-6 rounded-xl border border-[#dbe3ea] bg-white p-5 sm:p-6">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div className="grid flex-1 gap-5 sm:grid-cols-3 sm:items-end">
+            <div><p className="text-xs font-bold uppercase tracking-wide text-[#718198]">Connected sources</p><p className="mt-2 text-2xl font-semibold tabular-nums text-[#182b3a]">{evidence.sources.length}</p></div>
+            <div><p className="text-xs font-bold uppercase tracking-wide text-[#718198]">Records</p><p className="mt-2 text-2xl font-semibold tabular-nums text-[#182b3a]">{evidence.unique_event_count.toLocaleString("en-IN")}</p></div>
+            <div><p className="text-xs font-bold uppercase tracking-wide text-[#718198]">Date range</p><p className="mt-2 text-base font-semibold text-[#263a4b]">{dateRange}</p></div>
+          </div>
+          <div className="shrink-0"><UploadStatementDialog applicant={applicant} config={config} onUploaded={onRefresh} /></div>
+        </div>
+      </section>
+
+      <section className="overflow-hidden rounded-xl border border-[#dbe3ea] bg-white">
+        <div className="border-b border-[#e5eaee] px-5 py-4 sm:px-6"><h2 className="text-lg font-semibold text-[#182b3a]">Sources</h2></div>
+        {evidence.sources.length ? (
+          <div>
+            <div className="hidden grid-cols-[1.1fr_1fr_1.4fr_90px_130px] gap-4 bg-[#f5f8fa] px-5 py-3 text-xs font-bold uppercase tracking-wide text-[#718198] md:grid sm:px-6"><span>Source type</span><span>Provider</span><span>Covered period</span><span>Records</span><span>Status</span></div>
+            {evidence.sources.map((source) => {
+              const status = source.unique_event_count > 0
+                ? { label: "Ready to review", className: "border-teal-200 bg-teal-50 text-teal-800" }
+                : { label: "Needs records", className: "border-amber-200 bg-amber-50 text-amber-800" };
+              return <div key={source.id} className="grid gap-4 border-t border-[#edf0f3] px-5 py-4 md:grid-cols-[1.1fr_1fr_1.4fr_90px_130px] md:items-center sm:px-6">
+                <div><p className="text-xs font-bold uppercase tracking-wide text-[#718198] md:hidden">Source type</p><p className="mt-1 font-semibold text-[#263a4b] md:mt-0">{evidenceTypeLabel(source.source_type)}</p></div>
+                <div><p className="text-xs font-bold uppercase tracking-wide text-[#718198] md:hidden">Provider</p><p className="mt-1 text-sm text-[#34495c] md:mt-0">{source.provider || "Not provided"}</p></div>
+                <div><p className="text-xs font-bold uppercase tracking-wide text-[#718198] md:hidden">Covered period</p><p className="mt-1 text-sm text-[#34495c] md:mt-0">{formatDate(source.period_start)} – {formatDate(source.period_end)}</p></div>
+                <div><p className="text-xs font-bold uppercase tracking-wide text-[#718198] md:hidden">Records</p><p className="mt-1 font-semibold tabular-nums text-[#263a4b] md:mt-0">{source.unique_event_count.toLocaleString("en-IN")}</p></div>
+                <div><p className="text-xs font-bold uppercase tracking-wide text-[#718198] md:hidden">Status</p><span className={status.className + " mt-1 inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold md:mt-0"}>{status.label}</span></div>
+              </div>;
+            })}
+          </div>
+        ) : (
+          <div className="px-5 py-12 text-center sm:px-6"><p className="font-semibold text-[#263a4b]">No sources yet</p><p className="mt-1 text-sm text-[#718198]">Add a CSV file to start building your evidence library.</p></div>
+        )}
+      </section>
+    </div>
+  );
 }
 
 function ScoreView({
@@ -356,7 +485,6 @@ function ScoreView({
   }, [product, score.applicant_id]);
 
   const hasEvidence = score.assertion_count > 0 && score.reliability > 0;
-  const colors = ["#2f61c5", "#008b78", "#cc7515", "#7051b8", "#49718a", "#98721d", "#5261a8"];
   const domainLabels: Record<string, string> = {
     commitment: "Payment history",
     income: "Income stability",
@@ -418,7 +546,7 @@ function ScoreView({
       </section>
       <section className="overflow-hidden rounded-xl border border-[#dbe3ea] bg-white">
         <div className="grid min-w-[520px] grid-cols-[minmax(260px,1fr)_100px_90px] gap-2 border-b border-[#dbe3ea] bg-[#f5f8fa] px-4 py-3 text-xs font-bold uppercase tracking-wide text-[#718198]"><span>What we looked at</span><span>Result</span><span className="text-right">Weight</span></div>
-        <div className="overflow-x-auto">{score.domains.map((domain, index) => { const label = domainLabels[domain.key] ?? domain.label; return <div key={domain.key} className="grid min-w-[520px] grid-cols-[minmax(260px,1fr)_100px_90px] items-center gap-2 border-b border-[#edf0f3] px-4 py-4 last:border-b-0"><div><div className="flex items-center justify-between gap-3"><span className="font-semibold text-[#263a4b]">{label}</span><HelpTip label={`${label} evidence coverage`}>Evidence coverage is {domain.reliability}%. {domain.reason_codes[0]?.message ?? "There is not enough supporting information for this area yet."}</HelpTip></div><div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#e7edf2]"><div className="h-full rounded-full" style={{ width: `${domain.adjusted}%`, backgroundColor: colors[index % colors.length] }} /></div></div><span className="font-semibold tabular-nums">{domain.adjusted.toFixed(1)}</span><span className="text-right font-semibold tabular-nums text-[#2f61c5]">{domain.weight}%</span></div>; })}</div>
+        <div className="overflow-x-auto">{score.domains.map((domain) => { const label = domainLabels[domain.key] ?? domain.label; const tone = scoreTone(domain.adjusted, domain.reliability); const explanation = domainExplanation(domain); return <div key={domain.key} className="grid min-w-[520px] grid-cols-[minmax(260px,1fr)_100px_90px] items-center gap-2 border-b border-[#edf0f3] px-4 py-4 last:border-b-0"><div><div className="flex items-center justify-between gap-3"><span className="font-semibold text-[#263a4b]">{label}</span><HelpTip label={`Why ${label} has this result`}><div className="space-y-1"><p><span className="font-semibold">Why this result:</span> {explanation.why}</p><p><span className="font-semibold">Effect:</span> {explanation.effect}</p></div></HelpTip></div><div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#e7edf2]"><div className="h-full rounded-full" style={{ width: `${domain.adjusted}%`, backgroundColor: tone.barColor }} /></div></div><span className={`font-semibold tabular-nums ${tone.valueClass}`}>{domain.adjusted.toFixed(1)}</span><span className="text-right font-semibold tabular-nums text-[#52657a]">{domain.weight}%</span></div>; })}</div>
       </section>
     </div>
 
@@ -431,13 +559,17 @@ function ScoreView({
   </>;
 }
 
-function GuideView({ applicant, transition }: { applicant: Applicant | null; transition: TransitionResponse | null }) {
+function GuidePanel({ applicant, transition }: { applicant: Applicant | null; transition: TransitionResponse | null }) {
+  const [open, setOpen] = useState(false);
   const [prompts, setPrompts] = useState<GuidePrompt[]>([]);
   const [responses, setResponses] = useState<GuideResponse[]>([]);
   const [query, setQuery] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const sessionId = useMemo(() => `guide-${applicant?.id ?? "visitor"}`, [applicant?.id]);
+  const launcherRef = useRef<HTMLButtonElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const wasOpenRef = useRef(false);
+  const sessionId = useMemo(() => "guide-" + (applicant?.id ?? "visitor"), [applicant?.id]);
 
   useEffect(() => {
     let active = true;
@@ -448,6 +580,24 @@ function GuideView({ applicant, transition }: { applicant: Applicant | null; tra
     });
     return () => { active = false; };
   }, []);
+
+  useEffect(() => {
+    if (!open) {
+      if (wasOpenRef.current) launcherRef.current?.focus();
+      wasOpenRef.current = false;
+      return;
+    }
+    wasOpenRef.current = true;
+    const frame = window.requestAnimationFrame(() => inputRef.current?.focus());
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
 
   async function ask(question: string, intent?: GuidePrompt["intent"]) {
     const trimmed = question.trim();
@@ -465,6 +615,7 @@ function GuideView({ applicant, transition }: { applicant: Applicant | null; tra
         max_sources: 4,
       });
       setResponses((current) => [...current, response]);
+      if (response.suggested_prompts.length) setPrompts(response.suggested_prompts);
       setQuery("");
     } catch (cause) {
       setError(errorMessage(cause));
@@ -479,25 +630,49 @@ function GuideView({ applicant, transition }: { applicant: Applicant | null; tra
   }
 
   return <>
-    <SectionHeading eyebrow="Transition guide" title="Ask about moving or returning" detail="Get practical guidance about India account choices, residency, KYC and related steps. Answers are linked to official sources." />
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_280px]">
-      <section className="overflow-hidden rounded-xl border border-[#dbe3ea] bg-white">
-        <div className="border-b border-[#e5eaee] p-5 sm:p-6">
-          <h2 className="text-lg font-semibold text-[#182b3a]">What do you need to know?</h2>
-          <p className="mt-1 text-sm text-[#68798c]">Choose a question or write your own.</p>
-          {prompts.length ? <div className="mt-4 flex flex-wrap gap-2">{prompts.map((prompt) => <button key={prompt.id} type="button" onClick={() => void ask(prompt.query, prompt.intent)} disabled={pending} className="rounded-full border border-[#cbd8e6] bg-white px-3 py-2 text-left text-sm font-medium text-[#2f61c5] transition hover:border-[#2f61c5] hover:bg-[#f3f6fc] disabled:cursor-not-allowed disabled:opacity-50">{prompt.label}</button>)}</div> : null}
-        </div>
-        <div className="space-y-5 p-5 sm:p-6">
-          {responses.map((response, index) => <article key={`${response.query}-${index}`} className="space-y-3">
-            <div className="ml-auto max-w-[90%] rounded-lg bg-[#eaf0fb] px-4 py-3 text-sm text-[#203f82]"><p className="text-[11px] font-bold uppercase tracking-wide text-[#5872a6]">Your question</p><p className="mt-1 leading-6">{response.query}</p></div>
-            <div className="max-w-[95%] rounded-lg border border-[#dbe3ea] bg-white px-4 py-4"><div className="flex items-center gap-2"><p className="text-[11px] font-bold uppercase tracking-wide text-[#7051b8]">Guide</p>{response.abstained ? <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800">Outside current scope</span> : null}</div><p className="mt-2 whitespace-pre-line text-sm leading-6 text-[#34495c]">{response.answer}</p>{response.bullets.length ? <ul className="mt-3 space-y-2 pl-5 text-sm leading-6 text-[#34495c]">{response.bullets.map((bullet) => <li key={bullet} className="list-disc">{bullet}</li>)}</ul> : null}{response.citations.length ? <div className="mt-4 border-t border-[#edf0f3] pt-3"><p className="text-xs font-bold uppercase tracking-wide text-[#718198]">Sources</p><div className="mt-2 space-y-2">{response.citations.map((citation) => <a key={citation.id} href={citation.url} target="_blank" rel="noreferrer" className="block rounded-md border border-[#e1e7ed] px-3 py-2 text-sm transition hover:border-[#2f61c5] hover:bg-[#f8fafc]"><span className="font-semibold text-[#2f61c5]">{citation.title}</span><span className="mt-0.5 block text-xs text-[#718198]">{citation.publisher}{citation.locator ? ` · ${citation.locator}` : ""}</span></a>)}</div></div> : null}{response.follow_up_questions.length ? <div className="mt-4 border-t border-[#edf0f3] pt-3"><p className="text-xs font-bold uppercase tracking-wide text-[#718198]">You could also ask</p><div className="mt-2 flex flex-wrap gap-2">{response.follow_up_questions.map((followUp) => <button key={followUp} type="button" onClick={() => void ask(followUp)} disabled={pending} className="rounded-full border border-[#d5dde6] px-3 py-1.5 text-left text-xs font-medium text-[#2f61c5] hover:border-[#2f61c5] disabled:opacity-50">{followUp}</button>)}</div></div> : null}<p className="mt-4 border-t border-[#edf0f3] pt-3 text-xs leading-5 text-[#718198]">{response.disclaimer}</p></div>
+    <button
+      ref={launcherRef}
+      type="button"
+      aria-label={open ? "Close guide" : "Open guide"}
+      aria-expanded={open}
+      onClick={() => setOpen((current) => !current)}
+      className="fixed bottom-4 right-4 z-40 inline-flex items-center gap-2 rounded-full bg-[#182b3a] px-4 py-3 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(24,43,58,0.2)] transition hover:bg-[#243b4b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2f61c5] focus-visible:ring-offset-2 sm:bottom-6 sm:right-6"
+    >
+      {open ? <X className="size-4" aria-hidden="true" /> : <MessageCircle className="size-4" aria-hidden="true" />}
+      <span>Guide</span>
+    </button>
+
+    {open ? (
+      <section
+        role="dialog"
+        aria-modal="false"
+        aria-labelledby="guide-panel-title"
+        className="fixed inset-3 z-50 flex min-h-0 flex-col overflow-hidden rounded-2xl border border-[#cfd9e2] bg-[#f7f9fa] shadow-[0_20px_70px_rgba(24,43,58,0.24)] sm:inset-auto sm:bottom-6 sm:right-6 sm:h-[min(680px,calc(100vh-3rem))] sm:w-[390px]"
+      >
+        <header className="flex items-center justify-between border-b border-[#dbe3ea] bg-white px-4 py-3">
+          <div>
+            <h2 id="guide-panel-title" className="font-semibold text-[#182b3a]">Guide</h2>
+            <p className="mt-0.5 text-xs text-[#718198]">Moving, returning, and India account questions</p>
+          </div>
+          <button type="button" aria-label="Close guide" onClick={() => setOpen(false)} className="grid size-9 place-items-center rounded-md text-[#52657a] hover:bg-[#eef2f4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2f61c5]"><X className="size-4" /></button>
+        </header>
+
+        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
+          {!responses.length && prompts.length ? <div><p className="text-xs font-bold uppercase tracking-wide text-[#718198]">Suggested questions</p><div className="mt-2 flex flex-wrap gap-2">{prompts.map((prompt) => <button key={prompt.id} type="button" onClick={() => void ask(prompt.query, prompt.intent)} disabled={pending} className="rounded-full border border-[#cbd8e6] bg-white px-3 py-2 text-left text-xs font-medium text-[#2f61c5] transition hover:border-[#2f61c5] hover:bg-[#f3f6fc] disabled:cursor-not-allowed disabled:opacity-50">{prompt.label}</button>)}</div></div> : null}
+          {responses.map((response, index) => <article key={index} className="space-y-3">
+            <div className="ml-5 rounded-lg bg-[#eaf0fb] px-3 py-2.5 text-sm text-[#203f82]"><p className="text-[10px] font-bold uppercase tracking-wide text-[#5872a6]">Your question</p><p className="mt-1 leading-5">{response.query}</p></div>
+            <div className="rounded-lg border border-[#dbe3ea] bg-white p-3.5"><p className="text-sm leading-6 text-[#34495c]">{response.answer}</p>{response.bullets.length ? <ul className="mt-3 space-y-1.5 pl-5 text-sm leading-5 text-[#34495c]">{response.bullets.map((bullet) => <li key={bullet} className="list-disc">{bullet}</li>)}</ul> : null}{response.citations.length ? <div className="mt-3 border-t border-[#edf0f3] pt-3"><p className="text-[10px] font-bold uppercase tracking-wide text-[#718198]">Official sources</p><div className="mt-2 space-y-1.5">{response.citations.map((citation) => <a key={citation.id} href={citation.url} target="_blank" rel="noreferrer" className="block rounded-md border border-[#e1e7ed] px-2.5 py-2 text-xs transition hover:border-[#2f61c5] hover:bg-[#f8fafc]"><span className="font-semibold text-[#2f61c5]">{citation.title}</span><span className="mt-0.5 block text-[#718198]">{citation.publisher}{citation.locator ? " · " + citation.locator : ""}</span></a>)}</div></div> : null}{response.follow_up_questions.length ? <div className="mt-3 border-t border-[#edf0f3] pt-3"><p className="text-[10px] font-bold uppercase tracking-wide text-[#718198]">Follow-up questions</p><div className="mt-2 flex flex-wrap gap-2">{response.follow_up_questions.map((followUp) => <button key={followUp} type="button" onClick={() => void ask(followUp)} disabled={pending} className="rounded-full border border-[#d5dde6] px-2.5 py-1.5 text-left text-xs font-medium text-[#2f61c5] hover:border-[#2f61c5] disabled:opacity-50">{followUp}</button>)}</div></div> : null}<p className="mt-3 border-t border-[#edf0f3] pt-3 text-[11px] leading-5 text-[#718198]">{response.disclaimer}</p></div>
           </article>)}
-          {error ? <p className="rounded-md border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">{error}</p> : null}
+          {pending ? <div role="status" className="flex items-center gap-2 text-xs text-[#718198]"><LoaderCircle className="size-4 animate-spin" /> Checking the available sources…</div> : null}
+          {error ? <p role="alert" className="rounded-md border border-rose-200 bg-rose-50 p-3 text-xs leading-5 text-rose-800">{error}</p> : null}
         </div>
-        <form onSubmit={submit} className="border-t border-[#e5eaee] bg-[#f8fafb] p-5 sm:p-6"><label htmlFor="guide-question" className="sr-only">Ask the guide</label><textarea id="guide-question" value={query} onChange={(event) => setQuery(event.target.value)} maxLength={4000} rows={3} placeholder="For example: What should I review before returning to India?" className="w-full resize-y rounded-md border border-[#cbd6df] bg-white px-3 py-3 text-sm leading-6 text-[#263a4b] outline-none focus:border-[#2f61c5] focus:ring-2 focus:ring-[#2f61c5]/15" /><div className="mt-3 flex justify-end"><Button type="submit" disabled={!query.trim() || pending} className="shrink-0 bg-[#2f61c5] hover:bg-[#244fa5]">{pending ? <LoaderCircle className="animate-spin" /> : <Send />} {pending ? "Checking…" : "Ask guide"}</Button></div></form>
+
+        <form onSubmit={submit} className="border-t border-[#dbe3ea] bg-white p-3">
+          <label htmlFor="guide-question" className="sr-only">Ask the guide</label>
+          <div className="flex items-end gap-2"><textarea ref={inputRef} id="guide-question" value={query} onChange={(event) => setQuery(event.target.value)} maxLength={4000} rows={2} placeholder="Ask a question" className="min-h-11 flex-1 resize-none rounded-md border border-[#cbd6df] bg-white px-3 py-2.5 text-sm leading-5 text-[#263a4b] outline-none focus:border-[#2f61c5] focus:ring-2 focus:ring-[#2f61c5]/15" /><Button type="submit" size="icon" aria-label="Send question" disabled={!query.trim() || pending} className="shrink-0 bg-[#2f61c5] hover:bg-[#244fa5]">{pending ? <LoaderCircle className="animate-spin" /> : <Send />}</Button></div>
+        </form>
       </section>
-      <aside className="h-fit rounded-xl border border-[#dbe3ea] bg-white p-5"><h2 className="font-semibold text-[#182b3a]">Guide scope</h2><p className="mt-2 text-sm leading-6 text-[#617087]">Use it for questions about:</p><ul className="mt-4 space-y-3 text-sm text-[#34495c]"><li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0 text-[#008b78]" />NRI and NRO account choices</li><li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0 text-[#008b78]" />Moving abroad or returning to India</li><li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0 text-[#008b78]" />Residency, KYC, FATCA and CRS</li></ul><p className="mt-5 border-t border-[#edf0f3] pt-4 text-xs leading-5 text-[#718198]">If a question falls outside the available sources, the guide will say so.</p></aside>
-    </div>
+    ) : null}
   </>;
 }
 
@@ -513,7 +688,7 @@ function TransitionView({ applicant, transition, onSaved }: { applicant: Applica
 }
 
 function QueueView({ applicants, onOpen }: { applicants: Applicant[]; onOpen: (applicant: Applicant) => void }) {
-  return <><SectionHeading eyebrow="Applications" title="Review queue" detail="Applications awaiting a lending decision." /><div className="mb-6 grid gap-4 sm:grid-cols-3"><Metric label="Review ready" value={String(applicants.filter((item) => item.reliability >= 75 && item.score !== null).length)} note="Records are complete enough for a confident review. This status describes the records, not a lending outcome." /><Metric label="Check evidence" value={String(applicants.filter((item) => item.score !== null && item.reliability < 75).length)} note="A score is available, but the records need a closer look." /><Metric label="Evidence needed" value={String(applicants.filter((item) => item.score === null).length)} note="No score is available until usable records are added." /></div><section className="overflow-hidden rounded-xl border border-[#dbe3ea] bg-white"><div className="overflow-x-auto"><table className="w-full min-w-[820px] text-left text-sm"><thead className="bg-[#f5f8fa] text-xs uppercase tracking-wide text-[#65758a]"><tr><th className="px-5 py-3">Applicant</th><th className="px-4 py-3">Product</th><th className="px-4 py-3">Score</th><th className="px-4 py-3"><span className="inline-flex items-center gap-1">Evidence strength <HelpTip label="Evidence strength">This reflects how complete the uploaded records are, how much of the activity they cover, and how well separate sources support one another. It describes the records, not the accuracy of the system.</HelpTip></span></th><th className="px-4 py-3">Status</th><th className="px-4 py-3 text-right">Open</th></tr></thead><tbody>{applicants.map((applicant) => { const status = statusFor(applicant); return <tr key={applicant.id} onClick={() => onOpen(applicant)} className="cursor-pointer border-t border-[#edf0f3] transition hover:bg-[#f8fafb]"><td className="px-5 py-4"><div className="flex items-center gap-3"><span className="grid size-9 place-items-center rounded-full bg-[#eaf0fb] text-xs font-bold text-[#2f61c5]">{initials(applicant.name)}</span><div><p className="font-semibold text-[#203445]">{applicant.name}</p><p className="mt-0.5 text-xs text-[#738298]">{applicant.id} · {applicant.corridor}</p></div></div></td><td className="px-4 py-4">{productLabel(applicant.product)}</td><td className="px-4 py-4 font-semibold tabular-nums">{applicant.score ?? "No score yet"}</td><td className="px-4 py-4">{applicant.score === null ? "—" : `${applicant.reliability}%`}</td><td className="px-4 py-4"><span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${status.className}`}>{status.label}</span></td><td className="px-4 py-4 text-right"><ChevronRight className="ml-auto size-4" /></td></tr>})}</tbody></table></div></section></>;
+  return <><SectionHeading eyebrow="Applications" title="Review queue" detail="Applications awaiting a lending decision." /><div className="mb-6 grid gap-4 sm:grid-cols-3"><Metric label="Review ready" value={String(applicants.filter((item) => item.reliability >= 75 && item.score !== null).length)} note="Records are complete enough for a confident review. This status describes the records, not a lending outcome." /><Metric label="Check evidence" value={String(applicants.filter((item) => item.score !== null && item.reliability < 75).length)} note="A score is available, but the records need a closer look." /><Metric label="Evidence needed" value={String(applicants.filter((item) => item.score === null).length)} note="No score is available until usable records are added." /></div><section className="overflow-hidden rounded-xl border border-[#dbe3ea] bg-white"><div className="overflow-x-auto"><table className="w-full min-w-[820px] text-left text-sm"><thead className="bg-[#f5f8fa] text-xs uppercase tracking-wide text-[#65758a]"><tr><th className="px-5 py-3">Applicant</th><th className="px-4 py-3">Product</th><th className="px-4 py-3">Score</th><th className="px-4 py-3"><span className="inline-flex items-center gap-1">Evidence strength <HelpTip label="Evidence strength">This reflects how complete the uploaded records are, how much of the activity they cover, and how well separate sources support one another. It describes the records, not the accuracy of the system.</HelpTip></span></th><th className="px-4 py-3">Status</th><th className="px-4 py-3 text-right">Open</th></tr></thead><tbody>{applicants.map((applicant) => { const status = statusFor(applicant); return <tr key={applicant.id} onClick={() => onOpen(applicant)} className="cursor-pointer border-t border-[#edf0f3] transition hover:bg-[#f8fafb]"><td className="px-5 py-4"><div className="flex items-center gap-3"><span className="grid size-9 place-items-center rounded-full bg-[#eaf0fb] text-xs font-bold text-[#2f61c5]">{initials(applicant.name)}</span><div><p className="font-semibold text-[#203445]">{applicant.name}</p><p className="mt-0.5 text-xs text-[#738298]">{applicant.id} · {applicant.corridor}</p></div></div></td><td className="px-4 py-4">{productLabel(applicant.product)}</td><td className="px-4 py-4 font-semibold tabular-nums">{applicant.score ?? "No score yet"}</td><td className="px-4 py-4">{applicant.score === null ? "—" : `${applicant.reliability}%`}</td><td className="px-4 py-4"><span className="inline-flex items-center gap-1"><span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${status.className}`}>{status.label}</span>{status.label === "Review ready" ? <HelpTip label="Review ready">This means the uploaded records are complete enough for review. It is not an approval or lending outcome.</HelpTip> : null}</span></td><td className="px-4 py-4 text-right"><ChevronRight className="ml-auto size-4" /></td></tr>})}</tbody></table></div></section></>;
 }
 
 function CaseView({ applicant, evidence, score, onNavigate }: { applicant: Applicant; evidence: EvidenceResponse; score: ScoreResponse; onNavigate: (view: View) => void }) {
@@ -622,13 +797,14 @@ export default function Home() {
       <aside className={`fixed inset-y-0 left-0 z-40 w-[236px] border-r border-[#243b4b] bg-[#182b3a] px-3 py-4 text-white transition-transform lg:translate-x-0 ${mobileNav ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="flex h-full flex-col"><div className="flex items-center justify-between px-2 pb-5"><div className="flex items-center gap-3"><span className="grid size-9 place-items-center rounded-lg bg-[#2f61c5] font-bold">CP</span><div><p className="font-semibold leading-4">Credit Passport</p><p className="mt-1 text-[11px] text-[#9eb0bf]">{mode === "applicant" ? "My passport" : "Lender review"}</p></div></div><Button size="icon-sm" variant="ghost" className="lg:hidden" onClick={() => setMobileNav(false)}><X /></Button></div>
           <div className="mb-4 grid grid-cols-2 rounded-lg bg-white/7 p-1"><button onClick={() => switchMode("applicant")} className={`rounded-md px-2 py-2 text-xs font-semibold ${mode === "applicant" ? "bg-white text-[#182b3a]" : "text-[#b8c6d1]"}`}>Applicant</button><button onClick={() => switchMode("lender")} className={`rounded-md px-2 py-2 text-xs font-semibold ${mode === "lender" ? "bg-white text-[#182b3a]" : "text-[#b8c6d1]"}`}>Lender</button></div>
-          <nav aria-label="Primary navigation" className="space-y-1">{nav.map((item) => { const Icon = item.icon; return <button key={item.id} onClick={() => navigate(item.id)} disabled={!selected && item.id !== "queue" && item.id !== "validation" && item.id !== "guide"} className={`flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-35 ${view === item.id ? "bg-white text-[#182b3a]" : "text-[#c5d0d9] hover:bg-white/8 hover:text-white"}`}><Icon className="size-4" />{item.label}</button>; })}</nav>
+          <nav aria-label="Primary navigation" className="space-y-1">{nav.map((item) => { const Icon = item.icon; return <button key={item.id} onClick={() => navigate(item.id)} disabled={!selected && item.id !== "queue" && item.id !== "validation"} className={`flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-35 ${view === item.id ? "bg-white text-[#182b3a]" : "text-[#c5d0d9] hover:bg-white/8 hover:text-white"}`}><Icon className="size-4" />{item.label}</button>; })}</nav>
           <div className="mt-auto rounded-lg border border-white/10 bg-white/5 p-3"><div className="flex items-center gap-2 text-xs font-semibold text-[#dce5eb]"><span className="size-2 rounded-full bg-[#42c8a8]" /> API connected</div></div>
         </div>
       </aside>
       <div className="lg:pl-[236px]"><header className="sticky top-0 z-20 flex min-h-[68px] items-center justify-between border-b border-[#dbe3e9] bg-white/95 px-4 backdrop-blur sm:px-6 lg:px-8"><div className="flex items-center gap-3"><Button size="icon" variant="ghost" className="lg:hidden" onClick={() => setMobileNav(true)}><Menu /></Button><div><p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#8090a4]">Evidence period</p><p className="text-sm font-semibold text-[#34495c]">{evidencePeriod}</p></div></div><div className="flex items-center gap-3"><CreateApplicantDialog compact onCreated={created} />{selected ? <><select aria-label="Selected applicant" className="hidden h-9 max-w-[230px] rounded-md border border-[#d4dde5] bg-white px-3 text-sm sm:block" value={selected.id} onChange={(e) => void loadCase(e.target.value)}>{applicants.map((applicant) => <option key={applicant.id} value={applicant.id}>{applicant.name} · {applicant.id}</option>)}</select><span className="grid size-9 place-items-center rounded-full bg-[#eaf0fb] text-xs font-bold text-[#2f61c5]">{initials(selected.name)}</span></> : null}</div></header>
-        <div className="mx-auto max-w-[1380px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">{error ? <div className="mb-5 flex items-start justify-between gap-4 rounded-lg border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800"><span>{error}</span><button onClick={() => setError(null)}><X className="size-4" /></button></div> : null}{caseLoading ? <div className="mb-4 flex items-center gap-2 text-sm text-[#617087]"><LoaderCircle className="size-4 animate-spin" /> Refreshing passport…</div> : null}{view === "guide" ? <GuideView applicant={selected} transition={transition} /> : view === "queue" ? <QueueView applicants={applicants} onOpen={(applicant) => { void loadCase(applicant.id); setView("case"); }} /> : view === "validation" ? <ValidationView validation={validation} loading={validationLoading} onLoad={() => void loadValidation()} /> : !selected || !config || !evidence || !score || !transition ? <EmptyWorkspace onCreated={created} /> : view === "home" ? <HomeView applicant={selected} evidence={evidence} score={score} config={config} onNavigate={navigate} onRefresh={() => void refreshCase()} /> : view === "evidence" ? <EvidenceView applicant={selected} evidence={evidence} config={config} onRefresh={() => void refreshCase()} /> : view === "score" ? <ScoreView key={`${score.applicant_id}:${product}`} score={score} product={product} onProductChange={(next) => void changeProduct(next)} /> : view === "transition" ? <TransitionView applicant={selected} transition={transition} onSaved={setTransition} /> : <CaseView applicant={selected} evidence={evidence} score={score} onNavigate={navigate} />}</div>
+        <div className="mx-auto max-w-[1380px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">{error ? <div className="mb-5 flex items-start justify-between gap-4 rounded-lg border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800"><span>{error}</span><button onClick={() => setError(null)}><X className="size-4" /></button></div> : null}{caseLoading ? <div className="mb-4 flex items-center gap-2 text-sm text-[#617087]"><LoaderCircle className="size-4 animate-spin" /> Refreshing passport…</div> : null}{view === "queue" ? <QueueView applicants={applicants} onOpen={(applicant) => { void loadCase(applicant.id); setView("case"); }} /> : view === "validation" ? <ValidationView validation={validation} loading={validationLoading} onLoad={() => void loadValidation()} /> : !selected || !config || !evidence || !score || !transition ? <EmptyWorkspace onCreated={created} /> : view === "home" ? <HomeView applicant={selected} evidence={evidence} score={score} config={config} onNavigate={navigate} onRefresh={() => void refreshCase()} /> : view === "evidence" ? <EvidenceView applicant={selected} evidence={evidence} config={config} onRefresh={() => void refreshCase()} /> : view === "score" ? <ScoreView key={`${score.applicant_id}:${product}`} score={score} product={product} onProductChange={(next) => void changeProduct(next)} /> : view === "transition" ? <TransitionView applicant={selected} transition={transition} onSaved={setTransition} /> : <CaseView applicant={selected} evidence={evidence} score={score} onNavigate={navigate} />}</div>
       </div>
+      <GuidePanel applicant={selected} transition={transition} />
       </main>
     </TooltipProvider>
   );

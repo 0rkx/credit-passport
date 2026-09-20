@@ -1,0 +1,376 @@
+{
+  "analysis_version": "product-policy-sensitivity-v1",
+  "source": {
+    "generator": "credit_passport_model.synthetic.generate_synthetic_cohort",
+    "rows": 12000,
+    "random_state": 20260920,
+    "neutral_domain_score": 50.0,
+    "profile_spread_multiplier": 1.8,
+    "domain_order": [
+      "commitment",
+      "income",
+      "capacity",
+      "liquidity",
+      "shock",
+      "momentum",
+      "cross_border"
+    ],
+    "thresholds": {
+      "red": "<60",
+      "amber": "60-74",
+      "green": ">=75"
+    },
+    "labels_used": false,
+    "purpose": "internal policy sensitivity only; not outcome calibration"
+  },
+  "selected_candidate": "selected-v2",
+  "candidates": {
+    "v1": {
+      "products": {
+        "credit-card": {
+          "n": 12000,
+          "mean": 51.455,
+          "sd": 17.961,
+          "p10": 27.817,
+          "p25": 38.835,
+          "p50": 51.55,
+          "p75": 64.122,
+          "p90": 75.151,
+          "min": 1.138,
+          "max": 99.6,
+          "integer_unique_scores": 100,
+          "integer_floor_rate": 8.333333333333333e-05,
+          "integer_ceiling_rate": 0.0003333333333333333,
+          "bands": {
+            "red_below_60": 0.663583,
+            "amber_60_to_74": 0.229333,
+            "green_75_or_more": 0.107083
+          }
+        },
+        "personal-loan": {
+          "n": 12000,
+          "mean": 51.45,
+          "sd": 18.142,
+          "p10": 27.57,
+          "p25": 38.717,
+          "p50": 51.391,
+          "p75": 64.498,
+          "p90": 75.458,
+          "min": 1.138,
+          "max": 99.6,
+          "integer_unique_scores": 100,
+          "integer_floor_rate": 8.333333333333333e-05,
+          "integer_ceiling_rate": 0.0003333333333333333,
+          "bands": {
+            "red_below_60": 0.660583,
+            "amber_60_to_74": 0.229,
+            "green_75_or_more": 0.110417
+          }
+        },
+        "student-loan": {
+          "n": 12000,
+          "mean": 52.065,
+          "sd": 17.028,
+          "p10": 29.601,
+          "p25": 40.078,
+          "p50": 52.195,
+          "p75": 64.127,
+          "p90": 74.31,
+          "min": 2.275,
+          "max": 99.3,
+          "integer_unique_scores": 97,
+          "integer_floor_rate": 0.0,
+          "integer_ceiling_rate": 8.333333333333333e-05,
+          "bands": {
+            "red_below_60": 0.657917,
+            "amber_60_to_74": 0.2445,
+            "green_75_or_more": 0.097583
+          }
+        }
+      },
+      "pairwise": {
+        "personal-loan_vs_credit-card": {
+          "integer_difference_rate": 0.831833,
+          "absolute_difference_mean": 1.842,
+          "absolute_difference_at_least_3_rate": 0.28525
+        },
+        "personal-loan_vs_student-loan": {
+          "integer_difference_rate": 0.925917,
+          "absolute_difference_mean": 4.216,
+          "absolute_difference_at_least_3_rate": 0.642167
+        },
+        "credit-card_vs_student-loan": {
+          "integer_difference_rate": 0.932333,
+          "absolute_difference_mean": 4.753,
+          "absolute_difference_at_least_3_rate": 0.676417
+        }
+      },
+      "monotonicity_rate": {
+        "credit-card": 1.0,
+        "personal-loan": 1.0,
+        "student-loan": 1.0
+      }
+    },
+    "selected-v2": {
+      "products": {
+        "credit-card": {
+          "n": 12000,
+          "mean": 51.473,
+          "sd": 18.352,
+          "p10": 27.312,
+          "p25": 38.598,
+          "p50": 51.503,
+          "p75": 64.463,
+          "p90": 75.559,
+          "min": 1.138,
+          "max": 99.65,
+          "integer_unique_scores": 100,
+          "integer_floor_rate": 8.333333333333333e-05,
+          "integer_ceiling_rate": 0.0004166666666666667,
+          "bands": {
+            "red_below_60": 0.658417,
+            "amber_60_to_74": 0.22975,
+            "green_75_or_more": 0.111833
+          }
+        },
+        "personal-loan": {
+          "n": 12000,
+          "mean": 51.457,
+          "sd": 18.746,
+          "p10": 26.548,
+          "p25": 38.247,
+          "p50": 51.488,
+          "p75": 65.049,
+          "p90": 76.356,
+          "min": 1.138,
+          "max": 99.65,
+          "integer_unique_scores": 100,
+          "integer_floor_rate": 8.333333333333333e-05,
+          "integer_ceiling_rate": 0.0004166666666666667,
+          "bands": {
+            "red_below_60": 0.6555,
+            "amber_60_to_74": 0.224667,
+            "green_75_or_more": 0.119833
+          }
+        },
+        "student-loan": {
+          "n": 12000,
+          "mean": 51.649,
+          "sd": 17.327,
+          "p10": 28.88,
+          "p25": 39.299,
+          "p50": 51.71,
+          "p75": 63.984,
+          "p90": 74.47,
+          "min": 2.275,
+          "max": 99.2,
+          "integer_unique_scores": 98,
+          "integer_floor_rate": 0.0,
+          "integer_ceiling_rate": 0.00016666666666666666,
+          "bands": {
+            "red_below_60": 0.666083,
+            "amber_60_to_74": 0.234333,
+            "green_75_or_more": 0.099583
+          }
+        }
+      },
+      "pairwise": {
+        "personal-loan_vs_credit-card": {
+          "integer_difference_rate": 0.942333,
+          "absolute_difference_mean": 5.533,
+          "absolute_difference_at_least_3_rate": 0.720417
+        },
+        "personal-loan_vs_student-loan": {
+          "integer_difference_rate": 0.912833,
+          "absolute_difference_mean": 3.51,
+          "absolute_difference_at_least_3_rate": 0.57475
+        },
+        "credit-card_vs_student-loan": {
+          "integer_difference_rate": 0.945333,
+          "absolute_difference_mean": 5.672,
+          "absolute_difference_at_least_3_rate": 0.72775
+        }
+      },
+      "monotonicity_rate": {
+        "credit-card": 1.0,
+        "personal-loan": 1.0,
+        "student-loan": 1.0
+      }
+    },
+    "separation-heavy": {
+      "products": {
+        "credit-card": {
+          "n": 12000,
+          "mean": 51.548,
+          "sd": 18.574,
+          "p10": 26.879,
+          "p25": 38.461,
+          "p50": 51.536,
+          "p75": 64.739,
+          "p90": 75.924,
+          "min": 1.138,
+          "max": 99.65,
+          "integer_unique_scores": 100,
+          "integer_floor_rate": 8.333333333333333e-05,
+          "integer_ceiling_rate": 0.0005,
+          "bands": {
+            "red_below_60": 0.657667,
+            "amber_60_to_74": 0.225833,
+            "green_75_or_more": 0.1165
+          }
+        },
+        "personal-loan": {
+          "n": 12000,
+          "mean": 51.397,
+          "sd": 19.062,
+          "p10": 26.054,
+          "p25": 37.866,
+          "p50": 51.433,
+          "p75": 65.164,
+          "p90": 76.736,
+          "min": 1.138,
+          "max": 99.65,
+          "integer_unique_scores": 100,
+          "integer_floor_rate": 8.333333333333333e-05,
+          "integer_ceiling_rate": 0.0005,
+          "bands": {
+            "red_below_60": 0.653833,
+            "amber_60_to_74": 0.222167,
+            "green_75_or_more": 0.124
+          }
+        },
+        "student-loan": {
+          "n": 12000,
+          "mean": 51.649,
+          "sd": 17.327,
+          "p10": 28.88,
+          "p25": 39.299,
+          "p50": 51.71,
+          "p75": 63.984,
+          "p90": 74.47,
+          "min": 2.275,
+          "max": 99.2,
+          "integer_unique_scores": 98,
+          "integer_floor_rate": 0.0,
+          "integer_ceiling_rate": 0.00016666666666666666,
+          "bands": {
+            "red_below_60": 0.666083,
+            "amber_60_to_74": 0.234333,
+            "green_75_or_more": 0.099583
+          }
+        }
+      },
+      "pairwise": {
+        "personal-loan_vs_credit-card": {
+          "integer_difference_rate": 0.956,
+          "absolute_difference_mean": 7.716,
+          "absolute_difference_at_least_3_rate": 0.80175
+        },
+        "personal-loan_vs_student-loan": {
+          "integer_difference_rate": 0.918667,
+          "absolute_difference_mean": 3.982,
+          "absolute_difference_at_least_3_rate": 0.626667
+        },
+        "credit-card_vs_student-loan": {
+          "integer_difference_rate": 0.955833,
+          "absolute_difference_mean": 6.743,
+          "absolute_difference_at_least_3_rate": 0.770917
+        }
+      },
+      "monotonicity_rate": {
+        "credit-card": 1.0,
+        "personal-loan": 1.0,
+        "student-loan": 1.0
+      }
+    }
+  },
+  "weights": {
+    "v1": {
+      "credit-card": [
+        30,
+        15,
+        20,
+        15,
+        10,
+        5,
+        5
+      ],
+      "personal-loan": [
+        25,
+        20,
+        25,
+        10,
+        10,
+        5,
+        5
+      ],
+      "student-loan": [
+        15,
+        15,
+        20,
+        10,
+        10,
+        20,
+        10
+      ]
+    },
+    "selected-v2": {
+      "credit-card": [
+        35,
+        10,
+        15,
+        25,
+        5,
+        5,
+        5
+      ],
+      "personal-loan": [
+        20,
+        25,
+        30,
+        10,
+        5,
+        5,
+        5
+      ],
+      "student-loan": [
+        15,
+        15,
+        25,
+        10,
+        15,
+        10,
+        10
+      ]
+    },
+    "separation-heavy": {
+      "credit-card": [
+        40,
+        10,
+        10,
+        25,
+        5,
+        5,
+        5
+      ],
+      "personal-loan": [
+        15,
+        30,
+        30,
+        10,
+        5,
+        5,
+        5
+      ],
+      "student-loan": [
+        15,
+        15,
+        25,
+        10,
+        15,
+        10,
+        10
+      ]
+    }
+  }
+}

@@ -27,13 +27,13 @@
   "cases": [
     {
       "case_id": "steady-multi-source",
-      "name": "Anika Example (demo)",
+      "name": "Anika Mehta",
       "corridor": "UAE → India",
       "product": "personal-loan",
       "requested_amount": 500000,
       "currency": "INR",
-      "employment": "Full-time salaried (demo)",
-      "residency": "Non-resident Indian, UAE (demo)",
+      "employment": "Full-time salaried",
+      "residency": "Non-resident Indian, UAE",
       "expected_outcome": {
         "label": "strong / low risk",
         "review_route": "likely straightforward review",
@@ -45,26 +45,26 @@
         ]
       },
       "sources": [
-        {"file": "steady/01-bank-statement.csv", "source_type": "bank-statement", "provider": "Northstar Bank (demo)", "rows": 18, "purpose": "Net salary, everyday outflows, reserve transfers and running balances."},
-        {"file": "steady/02-payroll.csv", "source_type": "payroll", "provider": "Northstar Employer Payroll (demo)", "rows": 6, "purpose": "Independent gross-payroll record; dates and amounts are not exact duplicates of the bank rows."},
-        {"file": "steady/03-rent.csv", "source_type": "rent", "provider": "Harbor Homes (demo)", "rows": 6, "purpose": "Recurring housing commitment with due and paid dates."},
-        {"file": "steady/04-utilities.csv", "source_type": "utility", "provider": "Civic Utilities (demo)", "rows": 6, "purpose": "Recurring household utility bills with due and paid dates."},
-        {"file": "steady/05-platform-earnings.csv", "source_type": "platform-earnings", "provider": "TutorLoop (demo)", "rows": 6, "purpose": "Secondary platform earnings, separate from salary."},
-        {"file": "steady/06-remittances.csv", "source_type": "remittance", "provider": "BridgeSend (demo)", "rows": 4, "purpose": "Inbound remittances normalized to INR for the demo."},
-        {"file": "steady/07-asset-repayment.csv", "source_type": "asset-repayment", "provider": "EquipPay (demo)", "rows": 6, "purpose": "Equipment instalments with due and paid dates."},
-        {"file": "steady/08-insurance.csv", "source_type": "insurance", "provider": "Shield Mutual (demo)", "rows": 6, "purpose": "Protection-premium history with due and paid dates."},
-        {"file": "steady/09-wallet.csv", "source_type": "wallet", "provider": "PocketRail Wallet (demo)", "rows": 4, "purpose": "Mobile-wallet reserve top-ups and a small service spend."}
+        {"file": "steady/01-bank-statement.csv", "source_type": "bank-statement", "provider": "Northstar Bank", "rows": 18, "purpose": "Net salary, everyday outflows, reserve transfers and running balances."},
+        {"file": "steady/02-payroll.csv", "source_type": "payroll", "provider": "Northstar Employer Payroll", "rows": 6, "purpose": "Independent gross-payroll record; dates and amounts are not exact duplicates of the bank rows."},
+        {"file": "steady/03-rent.csv", "source_type": "rent", "provider": "Harbor Homes", "rows": 6, "purpose": "Recurring housing commitment with due and paid dates."},
+        {"file": "steady/04-utilities.csv", "source_type": "utility", "provider": "Civic Utilities", "rows": 6, "purpose": "Recurring household utility bills with due and paid dates."},
+        {"file": "steady/05-platform-earnings.csv", "source_type": "platform-earnings", "provider": "TutorLoop", "rows": 6, "purpose": "Secondary platform earnings, separate from salary."},
+        {"file": "steady/06-remittances.csv", "source_type": "remittance", "provider": "BridgeSend", "rows": 4, "purpose": "Inbound remittances normalized to INR for the demo."},
+        {"file": "steady/07-asset-repayment.csv", "source_type": "asset-repayment", "provider": "EquipPay", "rows": 6, "purpose": "Equipment instalments with due and paid dates."},
+        {"file": "steady/08-insurance.csv", "source_type": "insurance", "provider": "Shield Mutual", "rows": 6, "purpose": "Protection-premium history with due and paid dates."},
+        {"file": "steady/09-wallet.csv", "source_type": "wallet", "provider": "PocketRail Wallet", "rows": 4, "purpose": "Mobile-wallet reserve top-ups and a small service spend."}
       ]
     },
     {
       "case_id": "mixed-review",
-      "name": "Rohan Example (demo)",
+      "name": "Rohan Iyer",
       "corridor": "Singapore → India",
       "product": "personal-loan",
       "requested_amount": 700000,
       "currency": "INR",
-      "employment": "Small business and part-time salaried (demo)",
-      "residency": "Resident in India (demo)",
+      "employment": "Small business and part-time salaried",
+      "residency": "Resident in India",
       "expected_outcome": {
         "label": "mixed / manual review",
         "review_route": "ask for more context before deciding",
@@ -76,20 +76,20 @@
         ]
       },
       "sources": [
-        {"file": "mixed/01-bank-statement.csv", "source_type": "bank-statement", "provider": "Harborline Bank (demo)", "rows": 5, "purpose": "Short bank history with salary, spending and balances."},
-        {"file": "mixed/02-merchant-sales.csv", "source_type": "merchant-sales", "provider": "MarketRail Settlements (demo)", "rows": 3, "purpose": "Variable card-reader settlement income."},
-        {"file": "mixed/03-rent.csv", "source_type": "rent", "provider": "Harbor Homes (demo)", "rows": 3, "purpose": "Three rent observations with one missing due date and one late payment."}
+        {"file": "mixed/01-bank-statement.csv", "source_type": "bank-statement", "provider": "Harborline Bank", "rows": 5, "purpose": "Short bank history with salary, spending and balances."},
+        {"file": "mixed/02-merchant-sales.csv", "source_type": "merchant-sales", "provider": "MarketRail Settlements", "rows": 3, "purpose": "Variable card-reader settlement income."},
+        {"file": "mixed/03-rent.csv", "source_type": "rent", "provider": "Harbor Homes", "rows": 3, "purpose": "Three rent observations with one missing due date and one late payment."}
       ]
     },
     {
       "case_id": "weak-stressed",
-      "name": "Dev Example (demo)",
+      "name": "Dev Malhotra",
       "corridor": "Qatar → India",
       "product": "personal-loan",
       "requested_amount": 350000,
       "currency": "INR",
-      "employment": "Irregular contract work (demo)",
-      "residency": "Resident in India (demo)",
+      "employment": "Irregular contract work",
+      "residency": "Resident in India",
       "expected_outcome": {
         "label": "weak / high risk",
         "review_route": "needs remediation or a smaller exposure",
@@ -101,12 +101,12 @@
         ]
       },
       "sources": [
-        {"file": "weak/01-bank-statement.csv", "source_type": "bank-statement", "provider": "Harborline Bank (demo)", "rows": 12, "purpose": "Declining contract pay, household outflows and negative running balances."},
-        {"file": "weak/02-payroll.csv", "source_type": "payroll", "provider": "Contractor Payroll Desk (demo)", "rows": 3, "purpose": "Partial payroll record for the first three months only."},
-        {"file": "weak/03-platform-earnings.csv", "source_type": "platform-earnings", "provider": "QuickRoute Deliveries (demo)", "rows": 3, "purpose": "Small and sporadic gig payouts."},
-        {"file": "weak/04-rent.csv", "source_type": "rent", "provider": "Harbor Homes (demo)", "rows": 6, "purpose": "Housing payments with repeated late dates."},
-        {"file": "weak/05-utilities.csv", "source_type": "utility", "provider": "Civic Utilities (demo)", "rows": 6, "purpose": "Utility bills with repeated late dates."},
-        {"file": "weak/06-asset-repayment.csv", "source_type": "asset-repayment", "provider": "EquipPay (demo)", "rows": 6, "purpose": "Equipment instalments with repeated late dates."}
+        {"file": "weak/01-bank-statement.csv", "source_type": "bank-statement", "provider": "Harborline Bank", "rows": 12, "purpose": "Declining contract pay, household outflows and negative running balances."},
+        {"file": "weak/02-payroll.csv", "source_type": "payroll", "provider": "Contractor Payroll Desk", "rows": 3, "purpose": "Partial payroll record for the first three months only."},
+        {"file": "weak/03-platform-earnings.csv", "source_type": "platform-earnings", "provider": "QuickRoute Deliveries", "rows": 3, "purpose": "Small and sporadic gig payouts."},
+        {"file": "weak/04-rent.csv", "source_type": "rent", "provider": "Harbor Homes", "rows": 6, "purpose": "Housing payments with repeated late dates."},
+        {"file": "weak/05-utilities.csv", "source_type": "utility", "provider": "Civic Utilities", "rows": 6, "purpose": "Utility bills with repeated late dates."},
+        {"file": "weak/06-asset-repayment.csv", "source_type": "asset-repayment", "provider": "EquipPay", "rows": 6, "purpose": "Equipment instalments with repeated late dates."}
       ]
     }
   ]

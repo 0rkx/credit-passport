@@ -49,11 +49,11 @@ def statement_payload() -> dict:
         "consent": True,
         "records": [
             {"occurred_on": "2026-06-01", "event_type": "salary", "amount": 18000, "currency": "AED", "direction": "credit"},
-            {"occurred_on": "2026-06-02", "event_type": "rent", "amount": 5000, "currency": "AED", "direction": "debit", "due_on": "2026-06-02", "paid_on": "2026-06-02"},
+            {"occurred_on": "2026-06-02", "event_type": "rent", "amount": 8000, "currency": "AED", "direction": "debit", "due_on": "2026-06-02", "paid_on": "2026-06-02"},
             {"occurred_on": "2026-07-01", "event_type": "salary", "amount": 18000, "currency": "AED", "direction": "credit"},
-            {"occurred_on": "2026-07-02", "event_type": "rent", "amount": 5000, "currency": "AED", "direction": "debit", "due_on": "2026-07-02", "paid_on": "2026-07-02"},
+            {"occurred_on": "2026-07-02", "event_type": "rent", "amount": 8000, "currency": "AED", "direction": "debit", "due_on": "2026-07-02", "paid_on": "2026-07-02"},
             {"occurred_on": "2026-08-01", "event_type": "salary", "amount": 18500, "currency": "AED", "direction": "credit"},
-            {"occurred_on": "2026-08-02", "event_type": "rent", "amount": 5000, "currency": "AED", "direction": "debit", "due_on": "2026-08-02", "paid_on": "2026-08-02"},
+            {"occurred_on": "2026-08-02", "event_type": "rent", "amount": 8000, "currency": "AED", "direction": "debit", "due_on": "2026-08-02", "paid_on": "2026-08-02"},
         ],
     }
 
@@ -76,6 +76,18 @@ def test_health_config_and_empty_state(client: TestClient):
     model = client.get("/api/v1/model/validation")
     assert model.status_code == 200
     assert model.json()["status"] == "unavailable"
+
+
+def test_product_policies_are_distinct_and_sum_to_100(client: TestClient):
+    products = {item["product"]: item["weights"] for item in client.get("/api/v1/config").json()["products"]}
+
+    assert all(sum(weights.values()) == 100 for weights in products.values())
+    assert products["credit-card"]["commitment"] > products["personal-loan"]["commitment"]
+    assert products["credit-card"]["liquidity"] > products["personal-loan"]["liquidity"]
+    assert products["personal-loan"]["income"] > products["credit-card"]["income"]
+    assert products["personal-loan"]["capacity"] > products["credit-card"]["capacity"]
+    assert products["student-loan"]["shock"] > products["personal-loan"]["shock"]
+    assert products["student-loan"]["cross_border"] > products["personal-loan"]["cross_border"]
 
 
 def test_structured_ingestion_deduplicates_and_scores(client: TestClient):
@@ -108,13 +120,20 @@ def test_structured_ingestion_deduplicates_and_scores(client: TestClient):
 
     personal = client.get(f"/api/v1/applicants/{applicant_id}/score?product=personal-loan")
     card = client.get(f"/api/v1/applicants/{applicant_id}/score?product=credit-card")
+    student = client.get(f"/api/v1/applicants/{applicant_id}/score?product=student-loan")
     assert personal.status_code == card.status_code == 200
+    assert student.status_code == 200
     assert len(personal.json()["domains"]) == 7
     assert sum(domain["weight"] for domain in personal.json()["domains"]) == 100
     assert personal.json()["unique_event_count"] == 6
     assert personal.json()["reliability"] > 0
     assert personal.json()["reason_codes"]
     assert personal.json()["domains"] != card.json()["domains"]
+    assert personal.json()["score"] != card.json()["score"]
+    # Product weights are applied to the same observed events, so a profile
+    # with uneven capacity and income should not collapse to one universal
+    # score after rounding.
+    assert len({personal.json()["score"], card.json()["score"], student.json()["score"]}) >= 2
 
 
 def test_csv_statement_upload_persists_upload_and_recomputes_score(client: TestClient):

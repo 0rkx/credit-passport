@@ -1,18 +1,19 @@
 {
-  "base_url": "http://127.0.0.1:18002",
+  "base_url": "http://127.0.0.1:18003",
+  "scoring_version": "2026.09.v2",
   "cases": [
     {
-      "applicant_id": "CP-CE87A91C7FAA",
+      "applicant_id": "CP-79A7763A564A",
       "case_id": "steady-multi-source",
       "challenger": {
         "artifact_version": "icp-challenger-2026.09.20",
         "blend": {
-          "blended_score": 94.0316,
+          "blended_score": 93.3816,
           "challenger_score": 99.6616,
           "decision_use": "research-only",
           "model_contribution": 34.8816,
           "model_weight": 0.35,
-          "transparent_score": 91
+          "transparent_score": 90
         },
         "model_name": "icp_event_native_adverse_risk",
         "probability": 0.003384,
@@ -20,7 +21,7 @@
         "status": "available"
       },
       "decision": {
-        "score": 94.0316,
+        "score": 93.3816,
         "status": "research-only blend available"
       },
       "evidence": {
@@ -51,7 +52,7 @@
           "Remittances and multiple evidence types show a clear cross-border pattern"
         ]
       },
-      "name": "Anika Example (demo)",
+      "name": "Anika Mehta",
       "observed_outcome": {
         "risk_signal": "low",
         "score_signal": "strong"
@@ -60,90 +61,90 @@
         "band": "High",
         "reliability": 95,
         "reliability_band": "High",
-        "score": 91,
+        "score": 90,
         "score_range": {
-          "p10": 88,
-          "p90": 94
+          "p10": 87,
+          "p90": 93
         }
       },
       "uploaded_sources": [
         {
           "file": "steady/01-bank-statement.csv",
-          "provider": "Northstar Bank (demo)",
+          "provider": "Northstar Bank",
           "rows": 18,
-          "source_id": "SRC-A6149AB503A7",
+          "source_id": "SRC-1619C4EC1F69",
           "source_type": "bank-statement"
         },
         {
           "file": "steady/02-payroll.csv",
-          "provider": "Northstar Employer Payroll (demo)",
+          "provider": "Northstar Employer Payroll",
           "rows": 6,
-          "source_id": "SRC-AB8A40BD5461",
+          "source_id": "SRC-913CF34083F8",
           "source_type": "payroll"
         },
         {
           "file": "steady/03-rent.csv",
-          "provider": "Harbor Homes (demo)",
+          "provider": "Harbor Homes",
           "rows": 6,
-          "source_id": "SRC-194E9C078885",
+          "source_id": "SRC-D2394D47AFC1",
           "source_type": "rent"
         },
         {
           "file": "steady/04-utilities.csv",
-          "provider": "Civic Utilities (demo)",
+          "provider": "Civic Utilities",
           "rows": 6,
-          "source_id": "SRC-968DEDDA83C0",
+          "source_id": "SRC-C1929EB66FEB",
           "source_type": "utility"
         },
         {
           "file": "steady/05-platform-earnings.csv",
-          "provider": "TutorLoop (demo)",
+          "provider": "TutorLoop",
           "rows": 6,
-          "source_id": "SRC-6EFFD9F593BC",
+          "source_id": "SRC-51ADCDA5ED89",
           "source_type": "platform-earnings"
         },
         {
           "file": "steady/06-remittances.csv",
-          "provider": "BridgeSend (demo)",
+          "provider": "BridgeSend",
           "rows": 4,
-          "source_id": "SRC-871684D568AC",
+          "source_id": "SRC-F1F24B238358",
           "source_type": "remittance"
         },
         {
           "file": "steady/07-asset-repayment.csv",
-          "provider": "EquipPay (demo)",
+          "provider": "EquipPay",
           "rows": 6,
-          "source_id": "SRC-5056A540E9A0",
+          "source_id": "SRC-3B17AAA3E098",
           "source_type": "asset-repayment"
         },
         {
           "file": "steady/08-insurance.csv",
-          "provider": "Shield Mutual (demo)",
+          "provider": "Shield Mutual",
           "rows": 6,
-          "source_id": "SRC-ED9D63CDCE32",
+          "source_id": "SRC-A7C780C1B52C",
           "source_type": "insurance"
         },
         {
           "file": "steady/09-wallet.csv",
-          "provider": "PocketRail Wallet (demo)",
+          "provider": "PocketRail Wallet",
           "rows": 4,
-          "source_id": "SRC-DD9D17E4E2B7",
+          "source_id": "SRC-F03EC5E3EDD2",
           "source_type": "wallet"
         }
       ]
     },
     {
-      "applicant_id": "CP-AF7FE44BC593",
+      "applicant_id": "CP-B0610A540B9F",
       "case_id": "mixed-review",
       "challenger": {
         "artifact_version": "icp-challenger-2026.09.20",
         "blend": {
-          "blended_score": 73.3072,
+          "blended_score": 75.2572,
           "challenger_score": 92.4492,
           "decision_use": "research-only",
           "model_contribution": 32.3572,
           "model_weight": 0.35,
-          "transparent_score": 63
+          "transparent_score": 66
         },
         "model_name": "icp_event_native_adverse_risk",
         "probability": 0.075508,
@@ -151,7 +152,7 @@
         "status": "available"
       },
       "decision": {
-        "score": 73.3072,
+        "score": 75.2572,
         "status": "research-only blend available"
       },
       "evidence": {
@@ -176,7 +177,7 @@
           "Balances stay positive, but the short and uneven history limits confidence"
         ]
       },
-      "name": "Rohan Example (demo)",
+      "name": "Rohan Iyer",
       "observed_outcome": {
         "risk_signal": "low",
         "score_signal": "mixed"
@@ -185,38 +186,38 @@
         "band": "Medium",
         "reliability": 57,
         "reliability_band": "Medium",
-        "score": 63,
+        "score": 66,
         "score_range": {
-          "p10": 55,
-          "p90": 71
+          "p10": 58,
+          "p90": 74
         }
       },
       "uploaded_sources": [
         {
           "file": "mixed/01-bank-statement.csv",
-          "provider": "Harborline Bank (demo)",
+          "provider": "Harborline Bank",
           "rows": 5,
-          "source_id": "SRC-DA62B1223732",
+          "source_id": "SRC-3BCF968BBBA0",
           "source_type": "bank-statement"
         },
         {
           "file": "mixed/02-merchant-sales.csv",
-          "provider": "MarketRail Settlements (demo)",
+          "provider": "MarketRail Settlements",
           "rows": 3,
-          "source_id": "SRC-FB00D43AC8E6",
+          "source_id": "SRC-3A40F77A1618",
           "source_type": "merchant-sales"
         },
         {
           "file": "mixed/03-rent.csv",
-          "provider": "Harbor Homes (demo)",
+          "provider": "Harbor Homes",
           "rows": 3,
-          "source_id": "SRC-A7B3DD1979B0",
+          "source_id": "SRC-2B4EA1ADE7D3",
           "source_type": "rent"
         }
       ]
     },
     {
-      "applicant_id": "CP-8B60DFF0255A",
+      "applicant_id": "CP-054E834D3294",
       "case_id": "weak-stressed",
       "challenger": {
         "artifact_version": "icp-challenger-2026.09.20",
@@ -261,7 +262,7 @@
           "The bank balance becomes negative and no reserve, insurance or remittance buffer is observed"
         ]
       },
-      "name": "Dev Example (demo)",
+      "name": "Dev Malhotra",
       "observed_outcome": {
         "risk_signal": "high",
         "score_signal": "mixed"
@@ -279,50 +280,50 @@
       "uploaded_sources": [
         {
           "file": "weak/01-bank-statement.csv",
-          "provider": "Harborline Bank (demo)",
+          "provider": "Harborline Bank",
           "rows": 12,
-          "source_id": "SRC-CF22311BD327",
+          "source_id": "SRC-B3ECA2D16F93",
           "source_type": "bank-statement"
         },
         {
           "file": "weak/02-payroll.csv",
-          "provider": "Contractor Payroll Desk (demo)",
+          "provider": "Contractor Payroll Desk",
           "rows": 3,
-          "source_id": "SRC-ED382F684C9C",
+          "source_id": "SRC-12DBF52B99BD",
           "source_type": "payroll"
         },
         {
           "file": "weak/03-platform-earnings.csv",
-          "provider": "QuickRoute Deliveries (demo)",
+          "provider": "QuickRoute Deliveries",
           "rows": 3,
-          "source_id": "SRC-049359817330",
+          "source_id": "SRC-92B4F1D11355",
           "source_type": "platform-earnings"
         },
         {
           "file": "weak/04-rent.csv",
-          "provider": "Harbor Homes (demo)",
+          "provider": "Harbor Homes",
           "rows": 6,
-          "source_id": "SRC-574F0A13D5BD",
+          "source_id": "SRC-6265BF3BC70E",
           "source_type": "rent"
         },
         {
           "file": "weak/05-utilities.csv",
-          "provider": "Civic Utilities (demo)",
+          "provider": "Civic Utilities",
           "rows": 6,
-          "source_id": "SRC-5C13723CFC54",
+          "source_id": "SRC-152BC16E0E75",
           "source_type": "utility"
         },
         {
           "file": "weak/06-asset-repayment.csv",
-          "provider": "EquipPay (demo)",
+          "provider": "EquipPay",
           "rows": 6,
-          "source_id": "SRC-B309451E923F",
+          "source_id": "SRC-DC808830B58C",
           "source_type": "asset-repayment"
         }
       ]
     }
   ],
-  "generated_at": "2026-09-20T01:20:50.464064+00:00",
+  "generated_at": "2026-09-20T02:29:33.403850+00:00",
   "schema_version": "credit-passport-demo-run-1",
   "validation": {
     "checked_files": 18,

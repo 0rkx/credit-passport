@@ -148,9 +148,16 @@ The score is a transparent weighted score over:
 
 Each product has a separate weight vector. The vectors sum to 100:
 
-- credit card: 30/15/20/15/10/5/5;
-- personal loan: 25/20/25/10/10/5/5; and
-- student loan: 15/15/20/10/10/20/10.
+- credit card: 35/10/15/25/5/5/5;
+- personal loan: 20/25/30/10/5/5/5; and
+- student loan: 15/15/25/10/15/10/10.
+
+The order is commitment, income, capacity, liquidity, shock, momentum and
+cross-border robustness. Credit cards emphasise payment history and available
+cash buffer; personal loans emphasise observed income and room for a fixed
+instalment; student loans place more weight on current affordability and
+resilience than on long payment history. Momentum means observed income
+direction only and never stands in for projected graduate earnings.
 
 Source assertions are deduplicated into unique economic events using date, normalized event type, amount, currency and direction. A payroll record that matches a bank deposit corroborates that event; it does not award a second behavioral point. Reliability is reported separately from the behavioral score and is based on evidence volume, period coverage, source diversity, completeness and corroboration. With no evidence, the explicit score endpoint reports a neutral calculation with reliability `0`; applicant summary responses expose `score: null` so a UI can show “not available” rather than imply an assessed result.
 

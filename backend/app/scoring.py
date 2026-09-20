@@ -18,7 +18,7 @@ from .schemas import (
     ScoreResponse,
 )
 
-SCORING_VERSION = "2026.09.v1"
+SCORING_VERSION = "2026.09.v2"
 
 DOMAIN_LABELS: dict[str, str] = {
     "commitment": "Commitment performance",
@@ -41,31 +41,43 @@ DOMAIN_DESCRIPTIONS: dict[str, str] = {
 }
 
 PRODUCT_WEIGHTS: dict[ProductType, dict[str, int]] = {
+    # Revolving credit is most sensitive to whether a person has kept regular
+    # obligations current and can maintain a cash buffer between pay cycles.
+    # Capacity still matters, but the card policy does not let a strong income
+    # history compensate for weak payment or liquidity evidence as easily as a
+    # term-loan policy would.
     ProductType.CREDIT_CARD: {
-        "commitment": 30,
-        "income": 15,
-        "capacity": 20,
-        "liquidity": 15,
-        "shock": 10,
+        "commitment": 35,
+        "income": 10,
+        "capacity": 15,
+        "liquidity": 25,
+        "shock": 5,
         "momentum": 5,
         "cross_border": 5,
     },
+    # A fixed instalment needs observed room for a new payment and a stable
+    # current income stream. Cross-border continuity stays visible, but no
+    # policy-only or prospective-income signal enters this calculation.
     ProductType.PERSONAL_LOAN: {
-        "commitment": 25,
-        "income": 20,
-        "capacity": 25,
+        "commitment": 20,
+        "income": 25,
+        "capacity": 30,
         "liquidity": 10,
-        "shock": 10,
+        "shock": 5,
         "momentum": 5,
         "cross_border": 5,
     },
+    # For a student-loan review, current affordability and resilience matter
+    # more than a long payment history. Momentum means observed current-income
+    # direction only; it is deliberately not a proxy for projected graduate
+    # earnings or an education-provider promise.
     ProductType.STUDENT_LOAN: {
         "commitment": 15,
         "income": 15,
-        "capacity": 20,
+        "capacity": 25,
         "liquidity": 10,
-        "shock": 10,
-        "momentum": 20,
+        "shock": 15,
+        "momentum": 10,
         "cross_border": 10,
     },
 }
